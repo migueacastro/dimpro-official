@@ -2,8 +2,9 @@ from .models import *
 from alegra.client import Client as c
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
+from datetime import timedelta
 import base64
-
+from auditlog.models import LogEntry
 
 EXCLUDED_PRICETYPE_NAMES = ["EPA"]
 
@@ -15,6 +16,10 @@ def encodeduser():
     encoded_string = encoded_bytes.decode("utf-8")
     return encoded_string
 
+def remove_one_month_logs():
+    one_month_ago = timezone.now() - timedelta(days=30)
+    deleted_count, _ = LogEntry.objects.filter(timestamp__lt=one_month_ago).delete()
+    print("Removed "+deleted_count+" entries from more than a month ago")
 
 def updatedb():
 
@@ -81,7 +86,7 @@ def bulk_update_or_create_products(product_data_list):
     to_update = []
 
     for data in product_data_list:
-        
+
         # Check if product with the same reference already exists
         if int(data["id"]) in existing_products_list:
             prod = existing_products_map[int(data["id"])]
@@ -176,5 +181,10 @@ def update_price_types(price_list):
 
 
 def process_contact(row):
+    id= row.get("id", None)
     name = row["name"]
-    Contact.objects.update_or_create(name=name, defaults={"active": True})
+    seller = row.get("seller", None)
+    seller_name = str(seller["name"]).lower() if seller and "name" in seller else None
+    Contact.objects.update_or_create(
+       id=id, defaults={"active": True, "seller_name": seller_name,"name":name}
+    )

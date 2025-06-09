@@ -782,3 +782,26 @@ class PermissionViewSet(SafeViewSet):
     queryset = Permission.objects.filter(
         content_type__app_label__in=["auditlog", "dimpro"]
     )
+
+ 
+class PaymentMethodViewSet(SafeViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PaymentMethodSerializer
+    queryset = PaymentMethod.objects.filter(active=True)
+
+
+class PaymentReportViewSet(SafeViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PaymentReportSerializer
+    queryset = PaymentReport.objects.filter(active=True).order_by(
+            "-date"
+        )
+
+class UserPaymentReportViewSet(SafeViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PaymentReportSerializer
+
+    def get_queryset(self):
+        return PaymentReport.objects.filter(active=True, user=self.request.user.id).order_by(
+            "-date"
+        )

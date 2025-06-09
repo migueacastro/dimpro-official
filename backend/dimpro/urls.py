@@ -20,6 +20,10 @@ router.register(r'notes', NoteViewSet)
 router.register(r'logs', LogViewSet)
 router.register(r'groups', GroupViewSet)
 router.register(r'permissions', PermissionViewSet)
+router.register(r'payment_methods', PaymentMethodViewSet)
+router.register(r'payment_reports', PaymentReportViewSet)
+router.register(r'payment_reports_user', UserPaymentReportViewSet, basename="payment_reports_user")
+
 
 
 urlpatterns = [

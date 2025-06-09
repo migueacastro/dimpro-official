@@ -80,6 +80,17 @@
 				{#if checkPermission(user, 'view_product')}
 					<li>
 						<a
+							href="/dashboard/reports"
+							class="w-fit my-2 mx-auto h4 font-bold"
+							on:click={hideDrawer}
+						>
+							Reportes
+						</a>
+					</li>
+				{/if}
+				{#if checkPermission(user, 'view_product')}
+					<li>
+						<a
 							href="/dashboard/inventory"
 							class="w-fit my-2 mx-auto h4 font-bold"
 							on:click={hideDrawer}
@@ -243,6 +254,22 @@
 						style:pointer-events={!expandedSideBar ? 'none' : 'auto'}
 					>
 						Pedidos
+					</p>
+				</div>
+			</a>
+		{/if}
+		{#if checkPermission(user, 'view_product')}
+			<a href="/dashboard/reports">
+				<div class="px-8 flex flex-row items-center bg-gradient-to-br hover:variant-soft-surface">
+					<i class="py-5 fa-solid fa-clipboard h3 w-20"></i>
+					<p
+						class="font-bold h5 fixed left-20"
+						class:opacity-0={!expandedSideBar}
+						class:show-text={expandedSideBar}
+						class:hide-text={!expandedSideBar}
+						style:pointer-events={!expandedSideBar ? 'none' : 'auto'}
+					>
+						Reportes
 					</p>
 				</div>
 			</a>

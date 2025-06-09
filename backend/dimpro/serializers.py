@@ -18,7 +18,6 @@ from django.utils.translation import gettext
 from dimpro.helpers import translate_permission_name, translate_permission_content_type
 
 
-
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True, style={"input_type": "password"}, min_length=8, max_length=100
@@ -51,7 +50,6 @@ class UserLoginSerializer(serializers.ModelSerializer):
         fields = ["email", "password"]
 
 
-
 class ChangePasswordSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=100, style={"input_type": "password"}, write_only=True
@@ -78,15 +76,22 @@ class VerifyPasswordSerializer(serializers.ModelSerializer):
 class PermissionSerializer(serializers.ModelSerializer):
     translated_name = serializers.SerializerMethodField()
     translated_content_type = serializers.SerializerMethodField()
+
     class Meta:
         model = Permission
-        fields = ["id", "codename","name", "translated_name", "translated_content_type"]
+        fields = [
+            "id",
+            "codename",
+            "name",
+            "translated_name",
+            "translated_content_type",
+        ]
 
     def get_translated_name(self, obj):
         return translate_permission_name(obj.name) if obj.name else ""
+
     def get_translated_content_type(self, obj):
         return translate_permission_content_type(obj.codename) if obj.codename else ""
-      
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -97,8 +102,10 @@ class GroupSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        
-        data["permissions"] = PermissionSerializer(instance.permissions.all(), many=True).data
+
+        data["permissions"] = PermissionSerializer(
+            instance.permissions.all(), many=True
+        ).data
         return data
 
 
@@ -127,10 +134,9 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "name": {"required": True},
         }
-        
 
     def update(self, instance, validated_data):
-        
+
         if validated_data.get("confirmPassword"):
             validated_data.pop("confirmPassword")
         if "name" in validated_data:
@@ -155,6 +161,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = ["email", "name", "phonenumber"]
 
+
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -170,13 +177,13 @@ class PriceTypeSerializer(serializers.ModelSerializer):
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ["id","note", "name", "date","active"]
+        fields = ["id", "note", "name", "date", "active"]
 
 
 class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
-        fields = ["id", "name", "date_joined"]
+        fields = ["id", "name", "date_joined", "seller_name"]
 
 
 class OrderProductSerializer(
@@ -355,23 +362,27 @@ class LogSerializer(serializers.ModelSerializer):
     actor_email = serializers.SerializerMethodField(read_only=True)
     content_type_name = serializers.SerializerMethodField(read_only=True)
     action_name = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = LogEntry
         fields = "__all__"
-    
+
     def get_actor_name(self, obj):
         if obj.actor:
             return User.objects.get(id=obj.actor.id).name
         return None
+
     def get_content_type_name(self, obj):
         if obj.content_type:
             return obj.content_type.model
         return None
+
     def get_actor_email(self, obj):
         if obj.actor:
             return User.objects.get(id=obj.actor.id).email
         return None
-    def get_action_name(self,obj):
+
+    def get_action_name(self, obj):
         match obj.action:
             case 0:
                 return "creación"
@@ -424,3 +435,22 @@ class SetNewPasswordSerializer(serializers.Serializer):
             return user
         except Exception as e:
             raise AuthenticationFailed("The reset link is invalid", 401)
+
+
+class PaymentMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentMethod
+        fields = ["id", "name", "active"]
+
+
+class PaymentReportSerializer(serializers.ModelSerializer):
+    description = serializers.CharField(required=False)
+    class Meta:
+        model = PaymentReport
+        fields = ["id", "user", "contact", "date", "amount", "payment_method", "description", "active"]
+
+    def to_representation(self, instance):
+        self.fields["user"] = UserSerializer()
+        self.fields["contact"] = ContactSerializer()
+        self.fields["payment_method"] = PaymentMethodSerializer()
+        return super().to_representation(instance)

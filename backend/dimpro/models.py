@@ -152,6 +152,7 @@ class Contact(models.Model):
     name = models.CharField(max_length=128)
     date_joined = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(null = False, default=True)
+    seller_name = models.CharField(max_length=128, blank=True, null=True)
     def __str__(self):
         return str(self.id)
 auditlog.register(Contact)
@@ -215,11 +216,22 @@ class Note(models.Model):
 auditlog.register(Note)
 
 
-#class PasswordResetToken(models.Model):
-#    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='password_reset_tokens')
-#    token = models.CharField(max_length=256)
-#    date = models.DateTimeField(auto_now_add=True)
-#    active = models.BooleanField(default=True)
+class PaymentMethod(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=128, blank=True, null=True)
+    active = models.BooleanField(default=True, blank=False, null=False)
+
+
+class PaymentReport(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    contact = models.ForeignKey(Contact, on_delete=models.DO_NOTHING)
+    date = models.DateTimeField(auto_now_add=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    payment_method = models.ForeignKey(PaymentMethod, on_delete=models.DO_NOTHING) 
+    description = models.TextField(blank=True, null=True)
+    active = models.BooleanField(default=True, blank=False, null=False)
+
 
 # class Receivable(models.Model):
 #     active = models.BooleanField(default=False)
