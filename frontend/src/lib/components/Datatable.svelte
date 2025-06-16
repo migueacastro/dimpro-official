@@ -39,6 +39,7 @@
 	export let table_name = '';
 	export let model_name = '';
 	export let user: any = null;
+	export let hide_search: boolean = false;
 
 	$: loaded = false;
 	$: loading = true;
@@ -132,8 +133,11 @@
 
 <div class=" overflow-x-auto space-y-4" class:hidden={!loaded}>
 	<!-- Header -->
-	<header class="flex justify-between gap-4">
+	<header class="flex  gap-4 " class:justify-between={!hide_search}
+		class:justify-end={hide_search}>
+		{#if !hide_search}
 		<Search {handler} />
+		{/if}
 		<RowsPerPage {handler} />
 	</header>
 	<!-- Table -->

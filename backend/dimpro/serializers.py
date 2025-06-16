@@ -445,12 +445,29 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
 
 class PaymentReportSerializer(serializers.ModelSerializer):
     description = serializers.CharField(required=False)
+    contact_name = serializers.SerializerMethodField(read_only=True)
+    payment_method_name = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = PaymentReport
-        fields = ["id", "user", "contact", "date", "amount", "payment_method", "description", "active"]
+        fields = ["id", "user", "contact", "date", "amount", "payment_method", "description", "active", "payment_method_name", "contact_name"]
 
     def to_representation(self, instance):
         self.fields["user"] = UserSerializer()
         self.fields["contact"] = ContactSerializer()
         self.fields["payment_method"] = PaymentMethodSerializer()
         return super().to_representation(instance)
+    
+    def get_contact_name(self, obj):
+        if obj.contact:
+            return obj.contact.name
+        return "Ninguno"
+    def get_payment_method_name(self, obj):
+        if obj.payment_method:
+            return obj.payment_method.name
+        return "Ninguno"
+
+class ExportSinglePaymentReportPDFSerializer(serializers.Serializer):
+    report_id = serializers.IntegerField()
+
+    class Meta:
+        fields = ["report_id"]

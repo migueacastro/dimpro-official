@@ -192,8 +192,10 @@ class StaffOnlyLoginView(APIView):
             )
 
         user_instance = authenticate(email=email, password=password)
+        print(user_instance.groups.all())
         if (not user_instance) or not (
             user_instance.groups.filter(name="staff").exists()
+            or user_instance.groups.filter(name="admin").exists()
         ):
             raise AuthenticationFailed(
                 {"password": ["Correo o contraseña incorrectos o invalidos."]}
@@ -295,9 +297,10 @@ class UserViewSet(SafeViewSet):
 
     def create(self, request, *args, **kwargs):
         return create_user(self, request, *args, **kwargs)
-        
+
     def partial_update(self, request, *args, **kwargs):
         return partial_update_user(self, request, *args, **kwargs)
+
 
 class RefreshCSRFTokenView(APIView):
     permission_classes = (AllowAny,)
@@ -318,9 +321,10 @@ class StaffViewSet(SafeViewSet):
 
     def create(self, request, *args, **kwargs):
         return create_user(self, request, *args, **kwargs)
-    
+
     def partial_update(self, request, *args, **kwargs):
         return partial_update_user(self, request, *args, **kwargs)
+
 
 class ProductViewSet(SafeViewSet):
     serializer_class = ProductSerializer
@@ -410,14 +414,27 @@ class LogViewSet(SafeViewSet):
     filter_backends = [
         DjangoFilterBackend,
         filters.SearchFilter,
-        filters.OrderingFilter
+        filters.OrderingFilter,
     ]
     filterset_class = LogEntryFilter
     search_fields = [
-        "actor__name", "actor__email",
-        "content_type__model", "changes_text", "timestamp", "remote_addr",
+        "actor__name",
+        "actor__email",
+        "content_type__model",
+        "changes_text",
+        "timestamp",
+        "remote_addr",
     ]
-    ordering_fields = ["actor_id","actor", "actor__name","actor__email", "content_type__model", "changes_text", "timestamp", "remote_addr"]
+    ordering_fields = [
+        "actor_id",
+        "actor",
+        "actor__name",
+        "actor__email",
+        "content_type__model",
+        "changes_text",
+        "timestamp",
+        "remote_addr",
+    ]
 
 
 class ExportOrderPDFView(APIView):
@@ -588,7 +605,7 @@ class ExportInventoryPDFView(APIView):
             else:
                 price_value = "Ninguno"
 
-            #price = Paragraph(price_value, small_style)
+            # price = Paragraph(price_value, small_style)
 
             lines.append((id, item, details, reference, quantity))
 
@@ -599,7 +616,7 @@ class ExportInventoryPDFView(APIView):
             available_width * 0.30,
             available_width * 0.2,
             available_width * 0.2,
-            #available_width * 0.10,
+            # available_width * 0.10,
         ]
 
         table = Table(lines, colWidths=col_widths)
@@ -783,7 +800,7 @@ class PermissionViewSet(SafeViewSet):
         content_type__app_label__in=["auditlog", "dimpro"]
     )
 
- 
+
 class PaymentMethodViewSet(SafeViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = PaymentMethodSerializer
@@ -793,15 +810,152 @@ class PaymentMethodViewSet(SafeViewSet):
 class PaymentReportViewSet(SafeViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = PaymentReportSerializer
-    queryset = PaymentReport.objects.filter(active=True).order_by(
-            "-date"
+    queryset = PaymentReport.objects.filter(active=True).order_by("-date")
+
+
+class ExportSinglePaymentReportPDFView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ExportSinglePaymentReportPDFSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            id = serializer.validated_data.get("report_id", None)
+            if not id:
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST, data={"Error": "Invalid ID"}
+                )
+        instance = PaymentReport.objects.get(id=id, active=True)
+        if not instance:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND, data={"Error": "Report not found"}
+            )
+
+        buf = io.BytesIO()
+        doc = BaseDocTemplate(buf, pagesize=letter)
+        frame = Frame(
+            doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id="normal"
         )
+
+        small_style = ParagraphStyle(
+            "small",
+            parent=styles["Normal"],
+            fontSize=7,
+            leading=8,  # adjust as needed
+            spaceBefore=0,
+            spaceAfter=0,
+        )
+
+        center_style = ParagraphStyle(
+            "center",
+            parent=styles["Normal"],
+            fontSize=10,
+            leading=12,
+            alignment=1,  # Center alignment
+            spaceBefore=0,
+            spaceAfter=0,
+        )
+
+        template = PageTemplate(id="test", frames=frame)
+
+        lines = [["Contacto", "Método de Pago", "Monto", "Fecha"]]
+        contact_name_cell = Paragraph(
+            str(instance.contact.name) if instance.contact else "Ninguno", small_style
+        )
+        amount_cell = Paragraph(
+            str(instance.amount) + "$" if instance.amount else "Ninguno", small_style
+        )
+        date_cell = Paragraph(
+            (
+                str(instance.date.strftime('%d/%m/%Y %H:%M'))
+                if instance.date
+                else "Ninguno"
+            ),
+            small_style,
+        )
+        payment_method_cell = Paragraph(
+            str(instance.payment_method.name) if instance.payment_method else "Ninguno",
+            small_style,
+        )
+        lines.append(
+            (
+                contact_name_cell,
+                payment_method_cell,
+                amount_cell,
+                date_cell,
+            )
+        )
+
+        available_width = doc.width
+        col_widths = [
+            available_width * 0.25,
+            available_width * 0.25,
+            available_width * 0.25,
+            available_width * 0.25,
+        ]
+
+        table = Table(lines, colWidths=col_widths)
+
+        table.setStyle(
+            TableStyle(
+                [
+                    (
+                        "VALIGN",
+                        (0, 0),
+                        (-1, -1),
+                        "MIDDLE",
+                    ),  # Vertically center-align all cells
+                    ("INNERGRID", (0, 0), (-1, -1), 0.25, colors.black),
+                    ("BOX", (0, 0), (-1, -1), 0.25, colors.black),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("FONTSIZE", (0, 0), (-1, 0), 10),
+                    ("FONTSIZE", (0, 1), (-1, -1), 7),
+                ]
+            )
+        )
+
+        doc.addPageTemplates([template])
+
+        drawing = svg2rlg(BASE_DIR / "static_root" / "assets" / "logodimpro.svg")
+        if not drawing:
+            raise FileNotFoundError(
+                "The file 'assets/logodimpro.svg' could not be found."
+            )
+        drawing.width = 100
+        drawing.height = 0
+        drawing.hAlign = "CENTER"
+
+        spacer = Spacer(1, 12)
+        current_date = Paragraph(
+            f"<h4><b>Fecha:</b> {str(datetime.datetime.today().strftime('%d/%m/%Y %H:%M'))}</h4>",
+            styles["Normal"],
+        )
+
+        information = Paragraph(
+            f"<b>Vendedor</b>: {instance.user.name}<br/><b>Email</b>: {instance.user.email}<br/>",
+            styles["Normal"],
+        )
+        title = Paragraph(
+            f"<h2><b>Reporte de Pago #{instance.id}</b></h2>", center_style
+        )
+
+        story = [drawing, spacer, title, information, current_date, spacer, table]
+
+        doc.build(story)
+        buf.seek(0)
+
+        return FileResponse(
+            buf,
+            as_attachment=True,
+            filename=f"inventory-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+        )
+
 
 class UserPaymentReportViewSet(SafeViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = PaymentReportSerializer
 
     def get_queryset(self):
-        return PaymentReport.objects.filter(active=True, user=self.request.user.id).order_by(
-            "-date"
-        )
+        return PaymentReport.objects.filter(
+            active=True, user=self.request.user.id
+        ).order_by("-date")

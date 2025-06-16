@@ -231,6 +231,11 @@ class PaymentReport(models.Model):
     payment_method = models.ForeignKey(PaymentMethod, on_delete=models.DO_NOTHING) 
     description = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=True, blank=False, null=False)
+    class Meta:
+        permissions = [
+            ("select_custom_seller_paymentreport", "Can select custom seller"),
+            ("view_all_contacts_paymentreport", "Can view all contacts"),
+        ]
 
 
 # class Receivable(models.Model):

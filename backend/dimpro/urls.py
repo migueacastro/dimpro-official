@@ -42,6 +42,7 @@ urlpatterns = [
 
     path("export_order_pdf", ExportOrderPDFView.as_view()),
     path("export_inventory_pdf", ExportInventoryPDFView.as_view()),
+    path("export_payment_report_pdf", ExportSinglePaymentReportPDFView.as_view()),
     path("updatedb", UpdateDBView.as_view()),
     path("alegratoken", AlegraTokenView.as_view())
     # path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

@@ -127,6 +127,7 @@ PERMISSION_TRANSLATIONS = {
     "image": "imagen",
     "session": "sesión",
     "settings": "configuración",
+    "select": "seleccionar",
 }
 
 PERMISSION_CONTENT_TYPE_NAME_TRANSLATIONS = {
@@ -143,7 +144,11 @@ PERMISSION_CONTENT_TYPE_NAME_TRANSLATIONS = {
     "update database": "actualizar base de datos",
     "receivable": "cuenta por cobrar",
     "staff user": "empleado",
+    "payment report": "reporte de pago",
+    "payment method": "método de pago",
+    "all contacts": "todos los contactos",
     "advanced homepage": "página de inicio avanzada",
+    "custom seller": "otro vendedor",
 }
 PERMISSION_CONTENT_TYPE_TRANSLATIONS = {
     "user": "usuario",
@@ -172,6 +177,8 @@ PERMISSION_CONTENT_TYPE_TRANSLATIONS = {
     "passwordresettoken": "token de restablecimiento de contraseña",
     "pricetypetax": "impuesto de tipo de precio",
     "updatedb": "usuario",
+    "paymentreport": "reporte de pago",
+    "paymentmethod": "método de pago",
 }
 
 
@@ -186,15 +193,15 @@ def translate_permission_content_type(codename):
 
 
 def translate_permission_name(name):
-    name= str(name).lower()
+    name = str(name).lower()
     for key, value in PERMISSION_CONTENT_TYPE_NAME_TRANSLATIONS.items():
         if key in name:
             name = name.replace(key, value)
             break
     parts = name.split(" ")
-    for i,part in enumerate(parts):
+    for i, part in enumerate(parts):
         if part in PERMISSION_TRANSLATIONS:
-            parts[i] = PERMISSION_TRANSLATIONS[part] 
+            parts[i] = PERMISSION_TRANSLATIONS[part]
     name = " ".join(parts).replace("_", "")
 
     return name
@@ -211,7 +218,7 @@ def partial_update_user(self, request, *args, **kwargs):
 
     validated_data.pop("confirmPassword", None)
     user_groups = validated_data.pop("groups", None)
-
+    password = validated_data.pop("password", None)
     # Obtén el usuario actual que deseas actualizar
     current_user = self.get_object()
 
@@ -235,8 +242,8 @@ def partial_update_user(self, request, *args, **kwargs):
         current_user.name = validated_data.get("name")
     if "email" in validated_data:
         current_user.email = email
-    if "password" in validated_data:
-        current_user.set_password(validated_data.get("password"))
+    if password:
+        current_user.set_password(password)
     if "phonenumber" in validated_data:
         current_user.phonenumber = validated_data.get("phonenumber")
     if user_groups is not None:
@@ -256,6 +263,7 @@ def create_user(self, request, *args, **kwargs):
     validated_data = serializer.validated_data.copy()
     validated_data.pop("confirmPassword")
     user_groups = validated_data.pop("groups", None)
+    password = validated_data.pop("password", None)
 
     if not email:
         return Response(
@@ -272,6 +280,8 @@ def create_user(self, request, *args, **kwargs):
     user_instance, created = User.objects.update_or_create(
         email=email, active=True, defaults=validated_data
     )
+    if password:
+        user_instance.set_password(password)
     if user_groups is not None:
         user_instance.groups.set(user_groups)
     user_instance.save()
