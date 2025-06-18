@@ -226,7 +226,7 @@ class PaymentReport(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     contact = models.ForeignKey(Contact, on_delete=models.DO_NOTHING)
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(default=timezone.now, blank=False, null=False)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     payment_method = models.ForeignKey(PaymentMethod, on_delete=models.DO_NOTHING) 
     description = models.TextField(blank=True, null=True)
@@ -235,6 +235,8 @@ class PaymentReport(models.Model):
         permissions = [
             ("select_custom_seller_paymentreport", "Can select custom seller"),
             ("view_all_contacts_paymentreport", "Can view all contacts"),
+            ("view_own_paymentreport", "Can view its own payment report"),
+            ("view_export_paymentreport", "Can export payment report"),
         ]
 
 

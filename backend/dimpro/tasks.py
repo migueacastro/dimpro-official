@@ -154,6 +154,7 @@ def fetch_all_items(client):
             break
         items.extend(dictu)
         i += 1
+        time.sleep(1)
     return items
 
 
@@ -166,6 +167,7 @@ def fetch_all_contacts(client):
             break
         contacts.extend(dictu)
         i += 1
+        time.sleep(1)
     return contacts
 
 
@@ -201,9 +203,11 @@ def update_price_types(price_list):
 
 
 def process_contact(row):
-    id= row.get("id", None)
+    contact_id = row.get("id")
     name = row["name"]
-    Contact.objects.update_or_create(name=name, defaults={"active": True})
+    Contact.objects.update_or_create(
+        id=contact_id, defaults={"name": name, "active": True}
+    )
 
 
 def safe_update_products(client, retries=3):

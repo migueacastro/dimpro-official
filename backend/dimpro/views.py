@@ -813,6 +813,25 @@ class PaymentReportViewSet(SafeViewSet):
     queryset = PaymentReport.objects.filter(active=True).order_by("-date")
 
 
+class PaymentReportUserMonth(SafeViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PaymentReportSerializer
+
+    def get_queryset(self):
+        user_id = self.request.GET.get("user", None)
+        date = self.request.GET.get("date", None)
+        date = date.split("-") if date else None
+        if not user_id or not date:
+            return PaymentReport.objects.none()
+        
+        month = int(date[1])
+        year = int(date[0])
+
+        return PaymentReport.objects.filter(
+            active=True, user=user_id, date__month=month, date__year=year
+        ).order_by("-date")
+
+
 class ExportSinglePaymentReportPDFView(APIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ExportSinglePaymentReportPDFSerializer
@@ -925,7 +944,7 @@ class ExportSinglePaymentReportPDFView(APIView):
         drawing.height = 0
         drawing.hAlign = "CENTER"
 
-        spacer = Spacer(1, 12)
+        spacer = Spacer(1, 24)
         current_date = Paragraph(
             f"<h4><b>Fecha:</b> {str(datetime.datetime.today().strftime('%d/%m/%Y %H:%M'))}</h4>",
             styles["Normal"],
@@ -939,7 +958,12 @@ class ExportSinglePaymentReportPDFView(APIView):
             f"<h2><b>Reporte de Pago #{instance.id}</b></h2>", center_style
         )
 
-        story = [drawing, spacer, title, information, current_date, spacer, table]
+        description = Paragraph(
+            f"<p><b>Detalles</b>: {instance.description if instance.description else 'Ninguno'}.</p>",
+            styles["Normal"],
+        )
+
+        story = [drawing, spacer, title, information, current_date, spacer, table, description]
 
         doc.build(story)
         buf.seek(0)
@@ -950,6 +974,173 @@ class ExportSinglePaymentReportPDFView(APIView):
             filename=f"inventory-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
         )
 
+
+class ExportPaymentReportsMonthUserPDFView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ExportPaymentReportsMonthUserPDFSerializer
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        user_id = None
+        month = None
+        year = None
+        if serializer.is_valid():
+            user_id = serializer.validated_data.get("user", None)
+            date = serializer.validated_data.get("date", None)
+            year = date.split("-")[0] if date else None
+            month = date.split("-")[1] if date else None
+            if not user_id or not month or not year:
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST, data={"Error": "Invalid search parameters"}
+                )
+        reports = PaymentReport.objects.filter(user=user_id, date__month=month, date__year=year, active=True)
+
+        user = User.objects.get(id=user_id)
+        comission_percentage = 5
+        if not user:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND, data={"Error": "User not found"}
+            )
+        buf = io.BytesIO()
+        doc = BaseDocTemplate(buf, pagesize=letter)
+        frame = Frame(
+            doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id="normal"
+        )
+
+        
+
+        small_style = ParagraphStyle(
+            "small",
+            parent=styles["Normal"],
+            fontSize=7,
+            leading=8,  # adjust as needed
+            spaceBefore=0,
+            spaceAfter=0,
+        )
+
+        center_style = ParagraphStyle(
+            "center",
+            parent=styles["Normal"],
+            fontSize=10,
+            leading=12,
+            alignment=1,  # Center alignment
+            spaceBefore=0,
+            spaceAfter=0,
+        )
+
+        template = PageTemplate(id="test", frames=frame)
+
+        lines = [["Contacto", "Método de Pago", "Monto", "Detalles", "Fecha"]]
+        total_reports = 0
+        total_amount = 0.00
+        for report in reports:
+            contact_name_cell = Paragraph(
+                str(report.contact.name) if report.contact else "Ninguno", small_style
+            )
+            amount_cell = Paragraph(
+                str(report.amount) + "$" if report.amount else "Ninguno", small_style
+            )
+            date_cell = Paragraph(
+                (
+                    str(report.date.strftime('%d/%m/%Y %H:%M'))
+                    if report.date
+                    else "Ninguno"
+                ),
+                small_style,
+            )
+            payment_method_cell = Paragraph(
+                str(report.payment_method.name) if report.payment_method else "Ninguno",
+                small_style,
+            )
+            description_cell = Paragraph(
+                str(report.description) if report.description else "",
+                small_style,
+            )
+            lines.append(
+                (
+                    contact_name_cell,
+                    payment_method_cell,
+                    amount_cell,
+                    description_cell,
+                    date_cell,
+                )
+            )
+            total_reports += 1
+            total_amount += float(report.amount) if report.amount else 0
+
+
+        available_width = doc.width
+        col_widths = [
+            available_width * 0.20,
+            available_width * 0.20,
+            available_width * 0.20,
+            available_width * 0.25,
+            available_width * 0.15,
+        ]
+
+        table = Table(lines, colWidths=col_widths)
+
+        table.setStyle(
+            TableStyle(
+                [
+                    (
+                        "VALIGN",
+                        (0, 0),
+                        (-1, -1),
+                        "MIDDLE",
+                    ),  # Vertically center-align all cells
+                    ("INNERGRID", (0, 0), (-1, -1), 0.25, colors.black),
+                    ("BOX", (0, 0), (-1, -1), 0.25, colors.black),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("FONTSIZE", (0, 0), (-1, 0), 10),
+                    ("FONTSIZE", (0, 1), (-1, -1), 7),
+                ]
+            )
+        )
+
+        doc.addPageTemplates([template])
+
+        drawing = svg2rlg(BASE_DIR / "static_root" / "assets" / "logodimpro.svg")
+        if not drawing:
+            raise FileNotFoundError(
+                "The file 'assets/logodimpro.svg' could not be found."
+            )
+        drawing.width = 100
+        drawing.height = 0
+        drawing.hAlign = "CENTER"
+
+        spacer = Spacer(1, 24)
+        current_date = Paragraph(
+            f"<h4><b>Fecha:</b> {str(datetime.datetime.today().strftime('%d/%m/%Y %H:%M'))}</h4>",
+            styles["Normal"],
+        )
+
+        date = datetime.datetime(int(year), int(month), 1)
+        formated_date = date.strftime('%m/%Y')
+        title = Paragraph(
+        f"<h2><b>Reportes de pago del mes {formated_date}</b></h2>", center_style
+        )
+        information = Paragraph(
+            f"<b>Vendedor</b>: {user.name}<br/><b>Email</b>: {user.email}<br/><b>Total de reportes:</b> {total_reports}<br/><b>Monto acumulado:</b> {total_amount}$<br/><b>Comisión</b>: {total_amount * comission_percentage / 100}$",
+            styles["Normal"],
+        )
+        title = Paragraph(
+            f"<h2><b>Reportes de pago de {user.name} en el mes {formated_date} </b></h2>", center_style
+        )
+
+        sign = Paragraph(
+            f"<p><b>Firma:</b> ____________________________</p>", styles["Normal"]
+        )
+        second_spacer = Spacer(1, 24)
+        story = [drawing, spacer, title, information, current_date, spacer, table, second_spacer, sign]
+
+        doc.build(story)
+        buf.seek(0)
+
+        return FileResponse(
+            buf,
+            as_attachment=True,
+            filename=f"inventory-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+        )
 
 class UserPaymentReportViewSet(SafeViewSet):
     permission_classes = (IsAuthenticated,)

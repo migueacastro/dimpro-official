@@ -444,12 +444,17 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
 
 
 class PaymentReportSerializer(serializers.ModelSerializer):
-    description = serializers.CharField(required=False)
     contact_name = serializers.SerializerMethodField(read_only=True)
     payment_method_name = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = PaymentReport
         fields = ["id", "user", "contact", "date", "amount", "payment_method", "description", "active", "payment_method_name", "contact_name"]
+        extra_kwargs = {
+            'description': {
+                'required': False, 
+                'allow_blank': True
+            }
+        }
 
     def to_representation(self, instance):
         self.fields["user"] = UserSerializer()
@@ -471,3 +476,10 @@ class ExportSinglePaymentReportPDFSerializer(serializers.Serializer):
 
     class Meta:
         fields = ["report_id"]
+
+class ExportPaymentReportsMonthUserPDFSerializer(serializers.Serializer):
+    user = serializers.IntegerField()
+    date = serializers.CharField(max_length=10) 
+
+    class Meta:
+        fields = ["user", "date"]

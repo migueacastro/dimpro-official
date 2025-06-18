@@ -60,101 +60,112 @@
 					<i class="fa-solid fa-arrow-up h2"></i>
 				</button>
 
-				<ul class="my-2 mx-auto">
-					<li>
-						<a href="/dashboard" class="w-fit my-2 mx-auto h4 font-bold" on:click={hideDrawer}>
-							Inicio
-						</a>
-					</li>
-					{#if checkPermission(user, 'add_order')}
-						<li>
-							<a
-								href="/dashboard/add-order"
-								class="w-fit my-2 mx-auto h4 font-bold"
-								on:click={hideDrawer}
-							>
-								Crear Pedido
-							</a>
-						</li>
-					{/if}
-					{#if checkPermission(user, 'view_own_order')}
-						<li>
-							<a
-								href="/dashboard/orders"
-								class="w-fit my-2 mx-auto h4 font-bold"
-								on:click={hideDrawer}
-							>
-								Pedidos
-							</a>
-						</li>
-					{/if}
-					{#if checkPermission(user, 'view_product')}
-						<li>
-							<a
-								href="/dashboard/inventory"
-								class="w-fit my-2 mx-auto h4 font-bold"
-								on:click={hideDrawer}
-							>
-								Inventario
-							</a>
-						</li>
-					{/if}
-					{#if checkPermission(user, 'view_user')}
-						<li>
-							<a
-								href="/dashboard/users"
-								class="w-fit my-2 mx-auto h4 font-bold"
-								on:click={hideDrawer}
-							>
-								Vendedores
-							</a>
-						</li>
-					{/if}
-					{#if checkPermission(user, 'view_staff_user')}
-						<li>
-							<a
-								href="/dashboard/staff"
-								class="w-fit my-2 mx-auto h4 font-bold"
-								on:click={hideDrawer}
-							>
-								Empleados
-							</a>
-						</li>
-					{/if}
-					{#if checkPermission(user, 'view_settings_user')}
-						<li>
-							<a
-								href="/dashboard/settings"
-								class="w-fit my-2 mx-auto h4 font-bold"
-								on:click={hideDrawer}
-							>
-								Configuración
-							</a>
-						</li>
-					{/if}
+			<ul class="my-2 mx-auto">
+				<li>
+					<a href="/dashboard" class="w-fit my-2 mx-auto h4 font-bold" on:click={hideDrawer}>
+						Inicio
+					</a>
+				</li>
+				{#if checkPermission(user, 'add_order')}
 					<li>
 						<a
-							href="#"
-							on:click|preventDefault={() => {
-								hideDrawer();
-								goto('/logout');
-							}}
+							href="/dashboard/add-order"
 							class="w-fit my-2 mx-auto h4 font-bold"
+							on:click={hideDrawer}
 						>
-							Cerrar Sesión
+							Crear Pedido
 						</a>
 					</li>
+				{/if}
+				{#if checkPermission(user, 'view_own_order')}
 					<li>
-						<div class="w-fit my-2 mx-auto flex flex-row">
-							<p class="mr-6">Tema</p>
-							<LightSwitch></LightSwitch>
-						</div>
+						<a
+							href="/dashboard/orders"
+							class="w-fit my-2 mx-auto h4 font-bold"
+							on:click={hideDrawer}
+						>
+							Pedidos
+						</a>
 					</li>
-				</ul>
-			</nav>
-		{/if}
-	</Drawer>
-	<!-- END MOBILE DRAWER-->
+				{/if}
+				{#if checkPermission(user, 'view_paymentreport')}
+					<li>
+						<a
+							href="/dashboard/reports"
+							class="w-fit my-2 mx-auto h4 font-bold"
+							on:click={hideDrawer}
+						>
+							Reportes
+						</a>
+					</li>
+				{/if}
+				{#if checkPermission(user, 'view_product')}
+					<li>
+						<a
+							href="/dashboard/inventory"
+							class="w-fit my-2 mx-auto h4 font-bold"
+							on:click={hideDrawer}
+						>
+							Inventario
+						</a>
+					</li>
+				{/if}
+				{#if checkPermission(user, 'view_user')}
+					<li>
+						<a
+							href="/dashboard/users"
+							class="w-fit my-2 mx-auto h4 font-bold"
+							on:click={hideDrawer}
+						>
+							Vendedores
+						</a>
+					</li>
+				{/if}
+				{#if checkPermission(user, 'view_staff_user')}
+					<li>
+						<a
+							href="/dashboard/staff"
+							class="w-fit my-2 mx-auto h4 font-bold"
+							on:click={hideDrawer}
+						>
+							Empleados
+						</a>
+					</li>
+				{/if}
+				{#if checkPermission(user, 'view_settings_user')}
+					<li>
+						<a
+							href="/dashboard/settings"
+							class="w-fit my-2 mx-auto h4 font-bold"
+							on:click={hideDrawer}
+						>
+							Configuración
+						</a>
+					</li>
+				{/if}
+				<li>
+					<a
+						href="#"
+						on:click|preventDefault={() => {
+							hideDrawer();
+							goto('/logout');
+						}}
+						class="w-fit my-2 mx-auto h4 font-bold"
+					>
+						Cerrar Sesión
+					</a>
+				</li>
+				<li>
+					<div class="w-fit my-2 mx-auto flex flex-row">
+						<p class="mr-6">Tema</p>
+						<LightSwitch></LightSwitch>
+					</div>
+				</li>
+			</ul>
+		</nav>
+	{/if}
+</Drawer>
+<!-- END MOBILE DRAWER-->
 
 	<div class="h-screen animate-show flex flex-col overflow-auto w-full">
 		<!-- NAVBAR -->
@@ -163,7 +174,7 @@
 		>
 			<Toast />
 			<header
-				class:show-navbar={expandedDrawer == false}
+				class:show-navbar={!expandedDrawer}
 				class:hide-navbar={expandedDrawer}
 				class="w-full mx-auto"
 			>
@@ -257,6 +268,22 @@
 						style:pointer-events={!expandedSideBar ? 'none' : 'auto'}
 					>
 						Pedidos
+					</p>
+				</div>
+			</a>
+		{/if}
+		{#if checkPermission(user, 'view_paymentreport')}
+			<a href="/dashboard/reports">
+				<div class="px-8 flex flex-row items-center bg-gradient-to-br hover:variant-soft-surface">
+					<i class="py-5 fa-solid fa-clipboard h3 w-20"></i>
+					<p
+						class="font-bold h5 fixed left-20"
+						class:opacity-0={!expandedSideBar}
+						class:show-text={expandedSideBar}
+						class:hide-text={!expandedSideBar}
+						style:pointer-events={!expandedSideBar ? 'none' : 'auto'}
+					>
+						Reportes
 					</p>
 				</div>
 			</a>
