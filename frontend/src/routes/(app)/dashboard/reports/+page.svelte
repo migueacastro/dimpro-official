@@ -12,7 +12,7 @@
 		target: 'popupAutocomplete',
 		placement: 'bottom-start'
 	};
-	let selectedDate: string = data.selectedDate || new Date().toISOString().slice(0, 7);
+	let selectedDate: string = data.selectedDate;
 	let selectedUserId: any = data.selectedUserId;
 	let inputUser: string = data.inputUser || '';
 	let loaded = true;
@@ -42,13 +42,8 @@
 		if (response.ok) {
 			const blob = await response.blob();
 			const url = URL.createObjectURL(blob);
-			const a = document.createElement('a');
-			a.href = url;
-			a.download = `reportes_de_usuario_${listType == 'all' ? selectedUserId : data.user.id}_${selectedDate}.pdf`;
-			document.body.appendChild(a);
-			a.click();
-			a.remove();
-			URL.revokeObjectURL(url);
+			window.open(url, '_blank');
+			setTimeout(() => URL.revokeObjectURL(url), 10000);
 		} else {
 			console.log('Error al exportar PDF');
 		}
@@ -77,9 +72,9 @@
 			{/if}
 
 			{#if checkPermission(data.user, 'add_paymentreport')}
-			<a href="/dashboard/reports/add" class="btn variant-filled max-w-fit px-[2rem] ml-2 h-full">
-				<i class="fa-solid fa-plus"></i>
-			</a>
+				<a href="/dashboard/reports/add" class="btn variant-filled max-w-fit px-[2rem] ml-2 h-full">
+					<i class="fa-solid fa-plus"></i>
+				</a>
 			{/if}
 		</div>
 		{#if listType == 'all'}
@@ -142,7 +137,7 @@
 					step="1"
 					bind:value={selectedDate}
 					on:change={() => {
-						goto(`?user=${data.user.id}&date=${selectedDate}`);
+						goto(`?user=${selectedUserId}&date=${selectedDate}`);
 					}}
 				/>
 			</div>
@@ -162,11 +157,11 @@
 					</div>
 					<div class="flex flex-row space-x-3">
 						<h2 class="h2">Comisión:</h2>
-						<h2 class="h2 font-bold">{(Number(totalAmount) * 5) / 100}$</h2>
+						<h2 class="h2 font-bold">{((Number(totalAmount) * Number(data?.comission?.percentage || 0)) / 100).toFixed(2)}$</h2>
 					</div>
 				</div>
 
-				{#if filteredReports.length > 0 && checkPermission(data.user, 'view_export_paymentreport')}
+				{#if filteredReports.length > 0 && checkPermission(data.user, 'view_export_paymentreport') || listType == 'user' && data.userReports.length > 0}
 					<button
 						class="btn variant-filled max-w-fit px-[2rem] ml-2 py-3 h-fit"
 						type="button"
@@ -184,6 +179,7 @@
 					hide_search={true}
 					source_data={filteredReports}
 					editable={false}
+					endpoint={{ main: 'reports' }}
 					headings={['ID', 'Contacto', 'Método de Pago', 'Monto', 'Fecha']}
 					fields={['id', 'contact_name', 'payment_method_name', 'amount', 'date']}
 				/>
@@ -194,6 +190,7 @@
 					hide_search={true}
 					source_data={data.userReports}
 					editable={false}
+					endpoint={{ main: 'reports' }}
 					headings={['ID', 'Contacto', 'Método de Pago', 'Monto', 'Fecha']}
 					fields={['id', 'contact_name', 'payment_method_name', 'amount', 'date']}
 				/>

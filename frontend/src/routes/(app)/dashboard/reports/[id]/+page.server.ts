@@ -1,6 +1,6 @@
 import { apiURL } from "$lib/api_url";
 import { checkPermission, permissionError } from "$lib/auth";
-import { error } from "@sveltejs/kit";
+import { error, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "../$types";
 
 export const load: PageServerLoad = async ({fetch, locals, params}: any) => {
@@ -18,4 +18,26 @@ export const load: PageServerLoad = async ({fetch, locals, params}: any) => {
   return {
     report
   };
+};
+
+export const actions: Actions = {
+  delete: async ({ request, fetch }) => {
+    const formData = await request.formData();
+    const id = formData.get('id');
+    const response = await fetch(apiURL + 'payment_reports/' + id + '/', {
+      method: 'DELETE'
+    });
+    if (response.ok) {
+      return {
+        success: true
+      };
+    } else {
+      const data = await response.json();
+      console.log(data);
+      return {
+        success: false,
+        error: { data }
+      };
+    }
+  }
 };

@@ -1,4 +1,4 @@
-import { checkAdminGroup, checkPermission, permissionError } from "$lib/auth";
+import { checkPermission, permissionError } from "$lib/auth";
 import { redirect, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "../$types";
 import { apiURL } from "$lib/api_url";

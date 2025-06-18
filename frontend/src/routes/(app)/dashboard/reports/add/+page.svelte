@@ -49,6 +49,8 @@
 				const report_id = result.data.report.id;
 				console.log('Report ID:', report_id);
 				await downloadPDF(report_id);
+				window.location.href = '/dashboard/reports/' + report_id;
+				return;
 				
 			} else {
 				toastStore.trigger(errorSettings);
@@ -93,19 +95,7 @@
 		if (response.ok) {
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
-
-        // Para imprimir directamente:
         window.open(url, '_blank');
-
-    	// Si quieres descargar automáticamente:
-        // const a = document.createElement('a');
-        // a.href = url;
-        // a.download = `reporte_${report_id}.pdf`; 
-        // document.body.appendChild(a);
-        // a.click();
-        // a.remove();
-
-        // Limpia el objeto URL después de usarlo
         setTimeout(() => URL.revokeObjectURL(url), 10000);
     } else {
         console.error('No se pudo descargar el PDF');

@@ -24,6 +24,7 @@ router.register(r'payment_methods', PaymentMethodViewSet)
 router.register(r'payment_reports', PaymentReportViewSet)
 router.register(r'payment_reports_user', UserPaymentReportViewSet, basename="payment_reports_user")
 router.register(r'payment_reports_user_month', PaymentReportUserMonth, basename="payment_reports_user_month")
+router.register(r'comissions', ComissionViewSet, basename="comissions")
 
 
 

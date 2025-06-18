@@ -194,8 +194,8 @@ class StaffOnlyLoginView(APIView):
         user_instance = authenticate(email=email, password=password)
         print(user_instance.groups.all())
         if (not user_instance) or not (
-            user_instance.groups.filter(name="staff").exists() or
-            user_instance.groups.filter(name="admin").exists()
+            user_instance.groups.filter(name="staff").exists()
+            or user_instance.groups.filter(name="admin").exists()
         ):
             raise AuthenticationFailed(
                 {"password": ["Correo o contraseña incorrectos o invalidos."]}
@@ -823,7 +823,7 @@ class PaymentReportUserMonth(SafeViewSet):
         date = date.split("-") if date else None
         if not user_id or not date:
             return PaymentReport.objects.none()
-        
+
         month = int(date[1])
         year = int(date[0])
 
@@ -886,7 +886,7 @@ class ExportSinglePaymentReportPDFView(APIView):
         )
         date_cell = Paragraph(
             (
-                str(instance.date.strftime('%d/%m/%Y %H:%M'))
+                str(instance.date.strftime("%d/%m/%Y %H:%M"))
                 if instance.date
                 else "Ninguno"
             ),
@@ -963,7 +963,16 @@ class ExportSinglePaymentReportPDFView(APIView):
             styles["Normal"],
         )
 
-        story = [drawing, spacer, title, information, current_date, spacer, table, description]
+        story = [
+            drawing,
+            spacer,
+            title,
+            information,
+            current_date,
+            spacer,
+            table,
+            description,
+        ]
 
         doc.build(story)
         buf.seek(0)
@@ -978,6 +987,7 @@ class ExportSinglePaymentReportPDFView(APIView):
 class ExportPaymentReportsMonthUserPDFView(APIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ExportPaymentReportsMonthUserPDFSerializer
+
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         user_id = None
@@ -990,12 +1000,15 @@ class ExportPaymentReportsMonthUserPDFView(APIView):
             month = date.split("-")[1] if date else None
             if not user_id or not month or not year:
                 return Response(
-                    status=status.HTTP_400_BAD_REQUEST, data={"Error": "Invalid search parameters"}
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data={"Error": "Invalid search parameters"},
                 )
-        reports = PaymentReport.objects.filter(user=user_id, date__month=month, date__year=year, active=True)
+        reports = PaymentReport.objects.filter(
+            user=user_id, date__month=month, date__year=year, active=True
+        )
 
         user = User.objects.get(id=user_id)
-        comission_percentage = 5
+        comission_percentage = Comission.objects.get(id=1).percentage if Comission.objects.filter(id=1).exists() else 0
         if not user:
             return Response(
                 status=status.HTTP_404_NOT_FOUND, data={"Error": "User not found"}
@@ -1005,8 +1018,6 @@ class ExportPaymentReportsMonthUserPDFView(APIView):
         frame = Frame(
             doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id="normal"
         )
-
-        
 
         small_style = ParagraphStyle(
             "small",
@@ -1041,7 +1052,7 @@ class ExportPaymentReportsMonthUserPDFView(APIView):
             )
             date_cell = Paragraph(
                 (
-                    str(report.date.strftime('%d/%m/%Y %H:%M'))
+                    str(report.date.strftime("%d/%m/%Y %H:%M"))
                     if report.date
                     else "Ninguno"
                 ),
@@ -1066,7 +1077,6 @@ class ExportPaymentReportsMonthUserPDFView(APIView):
             )
             total_reports += 1
             total_amount += float(report.amount) if report.amount else 0
-
 
         available_width = doc.width
         col_widths = [
@@ -1115,23 +1125,34 @@ class ExportPaymentReportsMonthUserPDFView(APIView):
         )
 
         date = datetime.datetime(int(year), int(month), 1)
-        formated_date = date.strftime('%m/%Y')
+        formated_date = date.strftime("%m/%Y")
         title = Paragraph(
-        f"<h2><b>Reportes de pago del mes {formated_date}</b></h2>", center_style
+            f"<h2><b>Reportes de pago del mes {formated_date}</b></h2>", center_style
         )
         information = Paragraph(
-            f"<b>Vendedor</b>: {user.name}<br/><b>Email</b>: {user.email}<br/><b>Total de reportes:</b> {total_reports}<br/><b>Monto acumulado:</b> {total_amount}$<br/><b>Comisión</b>: {total_amount * comission_percentage / 100}$",
+            f"<b>Vendedor</b>: {user.name}<br/><b>Email</b>: {user.email}<br/><b>Total de reportes:</b> {total_reports}<br/><b>Monto acumulado:</b> {total_amount}$<br/><b>Comisión</b>: {float(float(total_amount) * float(comission_percentage) / 100.00):.2f}$",
             styles["Normal"],
         )
         title = Paragraph(
-            f"<h2><b>Reportes de pago de {user.name} en el mes {formated_date} </b></h2>", center_style
+            f"<h2><b>Reportes de pago de {user.name} en el mes {formated_date} </b></h2>",
+            center_style,
         )
 
         sign = Paragraph(
             f"<p><b>Firma:</b> ____________________________</p>", styles["Normal"]
         )
         second_spacer = Spacer(1, 24)
-        story = [drawing, spacer, title, information, current_date, spacer, table, second_spacer, sign]
+        story = [
+            drawing,
+            spacer,
+            title,
+            information,
+            current_date,
+            spacer,
+            table,
+            second_spacer,
+            sign,
+        ]
 
         doc.build(story)
         buf.seek(0)
@@ -1142,6 +1163,7 @@ class ExportPaymentReportsMonthUserPDFView(APIView):
             filename=f"inventory-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
         )
 
+
 class UserPaymentReportViewSet(SafeViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = PaymentReportSerializer
@@ -1150,3 +1172,21 @@ class UserPaymentReportViewSet(SafeViewSet):
         return PaymentReport.objects.filter(
             active=True, user=self.request.user.id
         ).order_by("-date")
+
+
+class ComissionViewSet(SafeViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ComissionSerializer
+
+    def get_queryset(self):
+        if not Comission.objects.filter(id=1, active=True).exists():
+            # If no comission exists, create a default one
+            Comission.objects.update_or_create(
+                id=1,
+                active=True,
+                defaults={
+                    "percentage": 5,
+                    "name": "Comisión de reportes de pago",
+                },
+            )
+        return Comission.objects.filter(active=True, id=1)

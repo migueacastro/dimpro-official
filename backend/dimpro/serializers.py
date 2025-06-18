@@ -460,6 +460,7 @@ class PaymentReportSerializer(serializers.ModelSerializer):
         self.fields["user"] = UserSerializer()
         self.fields["contact"] = ContactSerializer()
         self.fields["payment_method"] = PaymentMethodSerializer()
+        self.fields["date"] = serializers.DateTimeField(format="%Y/%m/%d %H:%M", read_only=True)
         return super().to_representation(instance)
     
     def get_contact_name(self, obj):
@@ -483,3 +484,10 @@ class ExportPaymentReportsMonthUserPDFSerializer(serializers.Serializer):
 
     class Meta:
         fields = ["user", "date"]
+
+
+class ComissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comission
+        fields = ["id", "percentage", "active"]
+    

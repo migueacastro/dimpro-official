@@ -128,6 +128,7 @@ PERMISSION_TRANSLATIONS = {
     "session": "sesión",
     "settings": "configuración",
     "select": "seleccionar",
+
 }
 
 PERMISSION_CONTENT_TYPE_NAME_TRANSLATIONS = {
@@ -137,6 +138,7 @@ PERMISSION_CONTENT_TYPE_NAME_TRANSLATIONS = {
     "exchange rate": "tasa de cambio",
     "order status": "status de pedido",
     "order product": "producto de pedido",
+    "comission": "comisión",
     "order_ product": "producto de pedido",
     "password reset token": "token de restablecimiento de contraseña",
     "price type": "tipo de precio",
@@ -179,6 +181,7 @@ PERMISSION_CONTENT_TYPE_TRANSLATIONS = {
     "updatedb": "usuario",
     "paymentreport": "reporte de pago",
     "paymentmethod": "método de pago",
+    "comission": "comisión",
 }
 
 

@@ -239,7 +239,13 @@ class PaymentReport(models.Model):
             ("view_export_paymentreport", "Can export payment report"),
         ]
 
+class Comission(models.Model):
+    id = models.AutoField(primary_key=True)
+    percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    name = models.CharField(max_length=128, blank=True, null=True)
+    active = models.BooleanField(default=True, blank=False, null=False)
 
+    
 # class Receivable(models.Model):
 #     active = models.BooleanField(default=False)
 #     seller = models.CharField(max_length=128, blank=True, null=True)
