@@ -98,6 +98,18 @@
 				</div>
 			</a>
 			{/if}
+
+			{#if checkPermission(user, 'view_paymentmethod')}
+				<a
+				class="block card card-hover lg:p-[3.75rem] p-[1.5rem] lg:w-[30%] my-2 lg:mx-2 dark:variant-filled-surface variant-filled-tertiary"
+				href="/dashboard/settings/paymentmethods"
+			>
+				<div class="flex flex-row justify-center h-[2rem] lg:h-auto items-center">
+					<p class="font-bold h4">Métodos de pago</p>
+					<i class="fa-solid fa-money-bill h3 ml-5" />
+				</div>
+			</a>
+			{/if}
 			
 			{#if checkPermission(user, 'view_updatedb_product')}
 			<form
