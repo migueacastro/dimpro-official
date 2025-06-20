@@ -5,7 +5,7 @@ import { loadEnv,defineConfig } from 'vite';
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, process.cwd());
 
-  const URL = `${env.DOMAIN ?? 'localhost'}`;
+  const URL = `${env.VITE_DOMAIN ?? 'localhost'}`;
 
 return {
 

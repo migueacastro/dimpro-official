@@ -21,6 +21,9 @@ fi
 
 # Update the .env file with the new MODE and VITE_MODE
 ENV_FILE=".env"
+
+DOMAIN=$(grep '^DOMAIN=' "$ENV_FILE" | cut -d '=' -f2- | tr -d '"')
+
 if [ -f "$ENV_FILE" ]; then
   # Update or add MODE and VITE_MODE in the .env file
   if grep -q "^MODE=" "$ENV_FILE"; then
@@ -35,6 +38,13 @@ if [ -f "$ENV_FILE" ]; then
     echo "VITE_MODE=$MODE" >> "$ENV_FILE"
   fi
   # Remove backup file created by sed
+
+  if grep -q "^VITE_DOMAIN=" "$ENV_FILE"; then
+    sed -i.bak "s/^VITE_DOMAIN=.*/VITE_DOMAIN=$DOMAIN/" "$ENV_FILE"
+  else
+    echo "VITE_DOMAIN=$DOMAIN" >> "$ENV_FILE"
+  fi
+
   rm -f "${ENV_FILE}.bak"
 else
   echo "Error: .env file not found!"
