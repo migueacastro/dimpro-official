@@ -40,6 +40,7 @@
 	export let model_name = '';
 	export let user: any = null;
 	export let hide_search: boolean = false;
+	export let hide_info: boolean = false;
 
 	$: loaded = false;
 	$: loading = true;
@@ -77,7 +78,7 @@
 			}
 			setTimeout(() => {
 				window.location.reload();
-			},1000);
+			}, 1000);
 		};
 
 		// kinda get it so far? if any you can base your own on this (copy and adapt xd) you don't have to understand it fully, but atleast now that
@@ -116,13 +117,11 @@
 	});
 </script>
 
-
 <div class=" overflow-x-auto space-y-4" class:hidden={!loaded}>
 	<!-- Header -->
-	<header class="flex  gap-4 " class:justify-between={!hide_search}
-		class:justify-end={hide_search}>
+	<header class="flex gap-4" class:justify-between={!hide_search} class:justify-end={hide_search}>
 		{#if !hide_search}
-		<Search {handler} />
+			<Search {handler} />
 		{/if}
 		<RowsPerPage {handler} />
 	</header>
@@ -148,7 +147,13 @@
 		</thead>
 		<tbody>
 			{#each $rows as row}
-				<tr on:click={() => {if(!editable){goto('/dashboard/' + endpoint['main']+`/${row['id']}`)}}}>
+				<tr
+					on:click={() => {
+						if (!editable) {
+							goto('/dashboard/' + endpoint['main'] + `/${row['id']}`);
+						}
+					}}
+				>
 					{#each fields as field}
 						{#if row[field]}
 							<td class="capitalize">{row[field]}</td>
@@ -159,41 +164,49 @@
 
 					{#if editable}
 						<td class="flex flex-row">
-							<button
-								class="btn mr-2 variant-filled"
-								on:click={() => {
-									setTimeout(() => {
-										goto('/dashboard/' + endpoint['main'] + '/' + row['id']);
-									}, 90);
-								}}
-							>
-								<i class="fa-solid fa-info"></i>
-							</button>
-							{#if user && model_name && checkPermission(user, 'delete_'+model_name)}
-							<form action="?/handleDelete" method="POST" use:enhance={deleteResult}>
-								<input type="hidden" name="id" value={row['id']} />
+							{#if !hide_info}
 								<button
-									type="button"
-									class="btn variant-filled"
-									on:click={(e) => deleteConfirmation(row['name'], row['id'], e)}
+									class="btn mr-2 variant-filled"
+									on:click={() => {
+										setTimeout(() => {
+											goto('/dashboard/' + endpoint['main'] + '/' + row['id']);
+										}, 90);
+									}}
 								>
-									<i class="fa-solid fa-trash"></i>
+									<i class="fa-solid fa-info"></i>
 								</button>
-							</form>
 							{/if}
-							{#if user && model_name && checkPermission(user, 'change_'+model_name)}
-							<button
-								class="btn ml-2 variant-filled"
-								on:click={() => {
-									setTimeout(() => {
-										goto(
-											'/dashboard/' + endpoint['main'] + '/' + `${endpoint['edit']}/` + row['id']
-										);
-									}, 90);
-								}}
-							>
-								<i class="fa-solid fa-pencil"></i>
-							</button>
+							{#if user && model_name && checkPermission(user, 'delete_' + model_name)}
+								<form action="?/handleDelete" method="POST" use:enhance={deleteResult}>
+									<input type="hidden" name="id" value={row['id']} />
+									<button
+										type="button"
+										class="btn variant-filled"
+										on:click={(e) => deleteConfirmation(row['name'], row['id'], e)}
+									>
+										<i class="fa-solid fa-trash"></i>
+									</button>
+								</form>
+							{/if}
+							{#if user && model_name && checkPermission(user, 'change_' + model_name)}
+								<button
+									class="btn ml-2 variant-filled"
+									on:click={() => {
+										setTimeout(() => {
+											goto(
+												endpoint['main']
+													? '/dashboard/' +
+															endpoint['main'] +
+															'/' +
+															`${endpoint['edit']}/` +
+															row['id']
+													: `${endpoint['edit']}/` + row['id']
+											);
+										}, 90);
+									}}
+								>
+									<i class="fa-solid fa-pencil"></i>
+								</button>
 							{/if}
 						</td>
 					{/if}
@@ -203,10 +216,15 @@
 				{#each fields as field}
 					<td class="capitalize">----</td>
 				{/each}
-				{#if editable && model_name && checkPermission(user, 'add_'+model_name)}
+				{#if editable && model_name && checkPermission(user, 'add_' + model_name)}
 					<button
 						class="btn variant-filled ml-[0.75rem]"
-						on:click={() => goto('/dashboard/' + endpoint['main'] + '/' + `${endpoint['add']}`)}
+						on:click={() =>
+							goto(
+								endpoint['main']
+									? '/dashboard/' + endpoint['main'] + '/' + `${endpoint['add']}`
+									: '/dashboard/' + `${endpoint['add']}`
+							)}
 					>
 						<i class="fa-solid fa-plus"></i>
 					</button>

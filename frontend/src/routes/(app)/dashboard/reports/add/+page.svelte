@@ -2,7 +2,6 @@
 	import { ProgressRadial, Autocomplete, getToastStore } from '@skeletonlabs/skeleton';
 	import type { PopupSettings, AutocompleteOption, ToastSettings } from '@skeletonlabs/skeleton';
 	import { popup } from '@skeletonlabs/skeleton';
-	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import { checkPermission } from '$lib/auth.js';
 	$: loaded = true;

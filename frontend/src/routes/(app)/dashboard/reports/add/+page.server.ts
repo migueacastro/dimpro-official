@@ -1,7 +1,7 @@
 import { apiURL } from '$lib/api_url';
 import { checkPermission, permissionError } from '$lib/auth';
 import { error, type Actions } from '@sveltejs/kit';
-import { report } from 'process';
+
 
 export async function load({ fetch, locals }: any) {
 	if (!checkPermission(locals.user, 'add_paymentreport')) {
