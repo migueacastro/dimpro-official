@@ -1,6 +1,13 @@
 import { apiURL } from "$lib/api_url";
+import { checkPermission, permissionError } from "$lib/auth";
 import type { Actions } from "@sveltejs/kit";
 import { error } from "console";
+
+export function load({locals}: any) {
+  if (!checkPermission(locals.user, 'add_paymentmethod')) {
+    return permissionError();
+  }
+}
 
 export const actions: Actions = {
   create: async ({ fetch, request }: any) => {
