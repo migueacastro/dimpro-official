@@ -55,6 +55,11 @@
 				on:focus={() => (touchedInput = true)}
 			/>
 		</div>
+    {#if errorMessage && errorMessage.length > 0 && touchedInput}
+			<div class="card p-4 variant-ghost-error">
+				{errorMessage}
+			</div>
+		{/if}
 
 		<button
 			type="submit"
@@ -63,10 +68,6 @@
 		>
 			Crear
 		</button>
-		{#if errorMessage && errorMessage.length > 0 && touchedInput}
-			<div class="card p-4 variant-ghost-error">
-				{errorMessage}
-			</div>
-		{/if}
+		
 	</form>
 {/if}

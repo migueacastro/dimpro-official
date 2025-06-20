@@ -3,7 +3,9 @@
 	import type { PopupSettings, AutocompleteOption, ToastSettings } from '@skeletonlabs/skeleton';
 	import { popup } from '@skeletonlabs/skeleton';
 	import { enhance } from '$app/forms';
-	import { checkPermission } from '$lib/auth.js';
+	import { checkAdminGroup, checkPermission } from '$lib/auth.js';
+	import levenshtein from 'string-comparison';
+
 	$: loaded = true;
 	export let data;
 	let popupSettingsContact: PopupSettings = {
@@ -50,7 +52,6 @@
 				await downloadPDF(report_id);
 				window.location.href = '/dashboard/reports/' + report_id;
 				return;
-				
 			} else {
 				toastStore.trigger(errorSettings);
 				errorMessage = result?.data?.error;
@@ -58,13 +59,29 @@
 		};
 	}
 	$: if (!checkPermission(data.user, 'view_all_contacts_paymentreport')) {
-		contactList =
-			data.contacts
-				.filter((contact: any) => contact.seller_name === data.user.name)
-				.map((contact: any) => ({
-					label: contact.name,
-					value: contact.id
-				})) ?? [];
+		if (checkAdminGroup(data.user)) {
+			contactList =
+				data.contacts
+					.filter((contact: any) => String(contact.seller_name).toLowerCase() === String('casa'))
+					.map((contact: any) => ({
+						label: contact.name,
+						value: contact.id
+					})) ?? [];
+		} else {
+			contactList =
+				data.contacts
+					.filter(
+						(contact: any) =>
+							levenshtein.levenshtein.similarity(
+								String(contact.seller_name).toLowerCase(),
+								String(data.user.name).toLowerCase()
+							) > 0.7
+					)
+					.map((contact: any) => ({
+						label: contact.name,
+						value: contact.id
+					})) ?? [];
+		}
 	} else {
 		contactList =
 			data.contacts.map((contact: any) => ({
@@ -85,21 +102,21 @@
 	}
 
 	async function downloadPDF(report_id: number) {
-    const response = await fetch(`/dashboard/reports/exportpdf/`+report_id, {
+		const response = await fetch(`/dashboard/reports/exportpdf/` + report_id, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
-			},
+			}
 		});
 		if (response.ok) {
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        setTimeout(() => URL.revokeObjectURL(url), 10000);
-    } else {
-        console.error('No se pudo descargar el PDF');
-    }
-}
+			const blob = await response.blob();
+			const url = URL.createObjectURL(blob);
+			window.open(url, '_blank');
+			setTimeout(() => URL.revokeObjectURL(url), 10000);
+		} else {
+			console.error('No se pudo descargar el PDF');
+		}
+	}
 </script>
 
 {#if !loaded}
