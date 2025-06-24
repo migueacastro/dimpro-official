@@ -228,7 +228,7 @@
 			on:mouseleave={() => (expandedSideBar = false)}
 			on:focus
 		>
-			<a href="/">
+			<button on:click={() => goto("/")}>
 				<div
 					class="px-2 flex flex-row items-center bg-gradient-to-br hover:variant-soft-surface mt-1"
 				>
@@ -237,7 +237,7 @@
 						<img src={logolight} alt="" class="mx-auto w-[9rem]" />
 					{/if}
 				</div>
-			</a>
+			</button>
 
 		<hr class="w-[80%] mx-auto my-2" />
 		{#if checkPermission(user, 'add_order')}
@@ -372,6 +372,11 @@
 		</aside>
 		<!-- END SIDEBAR -->
 		<div class="m-[2rem] lg:m-[3rem] lg:ml-[8rem]">
+			{#if data.show_back_button}
+				<button on:click={() => window.history.back()}>
+					<i class="fa fa-arrow-left"></i>
+				</button>
+			{/if}
 			<slot />
 		</div>
 		<Toast />

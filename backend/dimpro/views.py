@@ -422,6 +422,7 @@ class LogViewSet(SafeViewSet):
         "actor__email",
         "content_type__model",
         "changes_text",
+        "action",
         "timestamp",
         "remote_addr",
     ]
@@ -434,6 +435,7 @@ class LogViewSet(SafeViewSet):
         "changes_text",
         "timestamp",
         "remote_addr",
+        "action",
     ]
 
 
@@ -1008,7 +1010,11 @@ class ExportPaymentReportsMonthUserPDFView(APIView):
         )
 
         user = User.objects.get(id=user_id)
-        comission_percentage = Comission.objects.get(id=1).percentage if Comission.objects.filter(id=1).exists() else 0
+        comission_percentage = (
+            Comission.objects.get(id=1).percentage
+            if Comission.objects.filter(id=1).exists()
+            else 0
+        )
         if not user:
             return Response(
                 status=status.HTTP_404_NOT_FOUND, data={"Error": "User not found"}

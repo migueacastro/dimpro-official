@@ -362,27 +362,23 @@ class LogSerializer(serializers.ModelSerializer):
     actor_email = serializers.SerializerMethodField(read_only=True)
     content_type_name = serializers.SerializerMethodField(read_only=True)
     action_name = serializers.SerializerMethodField(read_only=True)
-
     class Meta:
         model = LogEntry
         fields = "__all__"
-
+    
     def get_actor_name(self, obj):
         if obj.actor:
             return User.objects.get(id=obj.actor.id).name
         return None
-
     def get_content_type_name(self, obj):
         if obj.content_type:
             return obj.content_type.model
         return None
-
     def get_actor_email(self, obj):
         if obj.actor:
             return User.objects.get(id=obj.actor.id).email
         return None
-
-    def get_action_name(self, obj):
+    def get_action_name(self,obj):
         match obj.action:
             case 0:
                 return "creación"
@@ -390,8 +386,25 @@ class LogSerializer(serializers.ModelSerializer):
                 return "actualización"
             case 2:
                 return "eliminación"
+            case 3:
+                return "inicio / cierre de sesión"
             case _:
                 return "desconocido"
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        match instance.action:
+            case 0:
+                changes_text = "creación"
+            case 1:
+                changes_text = "actualización"
+            case 2:
+                changes_text = "eliminación"
+            case 3:
+                changes_text = "inicio / cierre de sesión"
+            case _:
+                changes_text = "desconocido"
+        data["changes_text"] = changes_text
+        return data
 
 
 class AlegraAPITokenSerializer(serializers.ModelSerializer):
