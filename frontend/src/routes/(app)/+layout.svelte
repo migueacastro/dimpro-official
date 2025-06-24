@@ -371,7 +371,7 @@
 			</a>
 		</aside>
 		<!-- END SIDEBAR -->
-		<div class="m-[2rem] lg:m-[3rem] lg:ml-[8rem]">
+		<div class="m-[2rem] lg:m-[3rem] lg:ml-[8rem] w-full">
 			{#if data.show_back_button}
 				<button on:click={() => window.history.back()}>
 					<i class="fa fa-arrow-left"></i>
