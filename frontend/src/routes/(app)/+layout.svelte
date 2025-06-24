@@ -382,7 +382,7 @@
 		<Toast />
 	</div>
 </div>
-	<div class="w-full justify-center mt-[8rem] fixed"transition:fade hidden={transitioning}>
+	<div class="w-full justify-center mt-[8rem] fixed" transition:fade hidden={!transitioning}>
 		<div class="my-auto w-fit mx-auto">
 			<ProgressRadial/>
 		</div>
