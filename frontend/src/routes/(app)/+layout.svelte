@@ -42,7 +42,7 @@
 	}
 </script>
 
-<div hidden={transitioning}>
+<div class="w-full h-full" hidden={transitioning}>
 	<Modal height="h-auto" regionBody="h-auto overflow-hidden"></Modal>
 
 	<!-- MOBILE DRAWER -->
