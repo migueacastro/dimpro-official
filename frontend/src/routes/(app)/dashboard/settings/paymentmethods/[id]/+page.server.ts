@@ -1,8 +1,12 @@
 import { apiURL } from "$lib/api_url";
+import { checkPermission, permissionError } from "$lib/auth";
 import type { Actions } from "@sveltejs/kit";
 import { error } from "@sveltejs/kit";
 
-export async function load({ fetch, params }: any) {
+export async function load({ fetch, params, locals }: any) {
+  if (!checkPermission(locals.user, 'change_paymentmethod')) {
+    return permissionError();
+  }
   const response = await fetch(apiURL + 'payment_methods/' + params.id);
   if (!response.ok) {
     return error(response.status, { message: 'Failed to load payment method' });

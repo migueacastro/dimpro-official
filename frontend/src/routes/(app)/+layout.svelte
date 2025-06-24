@@ -42,7 +42,7 @@
 	}
 </script>
 
-{#if !transitioning}
+<div hidden={transitioning}>
 	<Modal height="h-auto" regionBody="h-auto overflow-hidden"></Modal>
 
 	<!-- MOBILE DRAWER -->
@@ -148,7 +148,7 @@
 						href="#"
 						on:click|preventDefault={() => {
 							hideDrawer();
-							goto('/logout');
+							setTimeout(() => goto('/logout'), 100 );
 						}}
 						class="w-fit my-2 mx-auto h4 font-bold"
 					>
@@ -355,7 +355,7 @@
 				</a>
 			{/if}
 
-			<a href="#" on:click|preventDefault={() => goto('/logout')}>
+			<a href="#" on:click|preventDefault={() => setTimeout(() => goto('/logout'), 100 ) }>
 				<div class="px-7 flex flex-row items-center bg-gradient-to-br hover:variant-soft-surface">
 					<i class="py-5 fa-solid fa-arrow-right-from-bracket h3 w-20"></i>
 					<p
@@ -381,10 +381,9 @@
 		</div>
 		<Toast />
 	</div>
-{:else}
-	<div class="w-full justify-center mt-[8rem] fixed"transition:fade>
+</div>
+	<div class="w-full justify-center mt-[8rem] fixed"transition:fade hidden={transitioning}>
 		<div class="my-auto w-fit mx-auto">
 			<ProgressRadial/>
 		</div>
 	</div>
-{/if}
