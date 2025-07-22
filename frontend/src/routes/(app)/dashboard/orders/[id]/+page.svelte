@@ -18,12 +18,9 @@
 	});
 	let loaded = true;
 	async function downloadPDF() {
-		const response = await fetch(
-			'/dashboard/orders/exportpdf?order_id='+order?.id,
-			{
-				method: 'GET',
-			}
-		);
+		const response = await fetch('/dashboard/orders/exportpdf?order_id=' + order?.id, {
+			method: 'GET'
+		});
 		if (response.ok) {
 			const blob = await response.blob();
 			const url = URL.createObjectURL(blob);
@@ -66,18 +63,31 @@
 			<div class="flex flex-row">
 				{#if checkPermission(data.user, 'change_status_order')}
 					<StatusButton {order} />
+				{:else}
+					<button
+						type="button"
+						class="capitalize btn max-w-fit px-[2rem]"
+						class:variant-filled={order?.status === 'pendiente'}
+						class:variant-filled-primary={order?.status === 'preparado'}
+					>
+						{order?.status}
+					</button>
 				{/if}
 
 				{#if checkPermission(data.user, 'change_order')}
-				<button
-					class="btn variant-filled max-w-fit px-[2rem] mx-2"
-					on:click={() => goto('/dashboard/edit-order/' + order?.id)}
-				>
-					<i class="fa-solid fa-pen-to-square"></i>
-				</button>
+					<button
+						class="btn variant-filled max-w-fit px-[2rem] mx-2"
+						on:click={() => goto('/dashboard/edit-order/' + order?.id)}
+					>
+						<i class="fa-solid fa-pen-to-square"></i>
+					</button>
 				{/if}
-				{#if checkPermission(data.user, 'view_export_order')}
-					<button class="btn variant-filled max-w-fit px-[2rem] ml-2 h-full" type="button" on:click={downloadPDF}>
+				{#if checkPermission(data.user, 'view_export_order') && order?.status === 'preparado'}
+					<button
+						class="btn variant-filled max-w-fit px-[2rem] ml-2 h-full"
+						type="button"
+						on:click={downloadPDF}
+					>
 						<i class="fa-solid fa-download"></i>
 					</button>
 				{/if}
@@ -87,6 +97,7 @@
 			source_data={products}
 			headings={['ID', 'Item', 'Referencia', 'Cantidad', 'Precio', 'Costo']}
 			fields={['id', 'item', 'reference', 'quantity', 'price', 'cost']}
+			endpoint={null}
 		/>
 	{:else}
 		<div class="flex justify-center mt-[8rem]">

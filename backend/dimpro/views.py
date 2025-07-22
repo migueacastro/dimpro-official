@@ -341,7 +341,7 @@ class OrderViewSet(SafeViewSet):  # Te muestra de una vez sus propios OrderProdu
 
 class UserOrderViewSet(SafeViewSet):
     serializer_class = OrderSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return Order.objects.filter(active=True, user=self.request.user.id).order_by(
