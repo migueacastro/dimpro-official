@@ -151,7 +151,7 @@
 		{/if}
 		<div class="flex flex-col space-y-2">
 			<input type="hidden" name="contact" bind:value={selectedContactId} />
-			<label for="">Contacto</label>
+			<label for="">Cliente</label>
 			<input
 				class="input autocomplete my-2"
 				type="search"
@@ -173,7 +173,7 @@
 			/>
 		</div>
 		<div class="flex flex-col space-y-2">
-			<label for="payment_method"> Método de Pago </label>
+			<label for="payment_method">Método de Pago </label>
 			<select
 				class="select"
 				name="payment_method"
@@ -202,7 +202,7 @@
 			/>
 		</div>
 		<div class="flex flex-col space-y-2">
-			<label for="description">Descripción</label>
+			<label for="description">Descripción (A la cuenta de... y a la taza de...)</label>
 			<textarea name="description" id="description" class="textarea"
 				>{data.report.description}</textarea
 			>
