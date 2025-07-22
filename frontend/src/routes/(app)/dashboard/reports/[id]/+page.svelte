@@ -75,6 +75,7 @@
 				<h4 class="h4 capitalize my-2">Monto: {report?.amount}</h4>
 				<h4 class="h4 capitalize my-2">Método de pago: {report?.payment_method_name}</h4>
 				<h4 class="h4 capitalize my-2">Fecha: {report?.date}</h4>
+				<h4 class="h4 capitalize my-2">Descripción: {report?.payment_method_name}</h4>
 				<div class="flex flex-row mt-2">
 					{#if checkPermission(data.user, 'view_export_paymentreport')}
 						<button

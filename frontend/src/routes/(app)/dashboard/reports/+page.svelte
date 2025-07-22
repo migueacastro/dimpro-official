@@ -13,7 +13,7 @@
 		placement: 'bottom-start'
 	};
 	let selectedDate: string = data.selectedDate;
-	let selectedUserId: any = data.selectedUserId;
+	$: selectedUserId = data.selectedUserId;
 	let inputUser: string = data.inputUser || '';
 	let loaded = true;
 	let listType = 'all';
