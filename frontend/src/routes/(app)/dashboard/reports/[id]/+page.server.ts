@@ -4,7 +4,7 @@ import { error, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "../$types";
 
 export const load: PageServerLoad = async ({fetch, locals, params}: any) => {
-  if (!checkPermission(locals.user, 'view_paymentreport')  || checkPermission(locals.user, 'view_own_paymentreport')) {
+  if (!checkPermission(locals.user, 'view_paymentreport')  || !checkPermission(locals.user, 'view_own_paymentreport')) {
     return permissionError();
   }
   
