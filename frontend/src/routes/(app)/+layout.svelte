@@ -272,7 +272,7 @@
 				</div>
 			</a>
 		{/if}
-		{#if checkPermission(user, 'view_paymentreport')}
+		{#if checkPermission(user, 'view_paymentreport') || checkPermission(user, 'view_own_paymentreport')}
 			<a href="/dashboard/reports">
 				<div class="px-8 flex flex-row items-center bg-gradient-to-br hover:variant-soft-surface">
 					<i class="py-5 fa-solid fa-clipboard h3 w-20"></i>

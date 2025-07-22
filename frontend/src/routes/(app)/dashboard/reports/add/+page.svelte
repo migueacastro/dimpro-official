@@ -156,7 +156,7 @@
 		{/if}
 		<div class="flex flex-col space-y-2">
 			<input type="hidden" name="contact" bind:value={selectedContactId} />
-			<label for="">Contacto</label>
+			<label for="">Cliente</label>
 			<input
 				class="input autocomplete my-2"
 				type="search"
