@@ -186,7 +186,7 @@
 			</select>
 		</div>
 		<div class="flex flex-col space-y-2">
-			<label for="amount">Monto</label>
+			<label for="amount">Monto en dólares</label>
 			<input
 				name="amount"
 				bind:value={amount}

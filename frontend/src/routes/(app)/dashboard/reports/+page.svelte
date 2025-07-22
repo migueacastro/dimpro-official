@@ -77,7 +77,7 @@
 				</a>
 			{/if}
 		</div>
-		{#if listType == 'all'}
+		{#if listType == 'all' && checkPermission(data.user, 'view_paymentreport')}
 			<div class="flex flex-row space-x-2">
 				<div class="flex flex-col">
 					<label for="select-contact" class="text-md my-2">Usuario</label>
@@ -124,7 +124,7 @@
 					/>
 				</div>
 			</div>
-		{:else if listType == 'user'}
+		{:else if listType == 'user' && checkPermission(data.user, 'view_own_paymentreport')}
 			<div class="flex flex-col">
 				<label for="" class="text-md my-2">Mes</label>
 				<input
