@@ -188,17 +188,7 @@
 					fields={['id', 'contact_name', 'payment_method_name', 'amount', 'date']}
 				/>
 			{/key}
-			{#key selectedUserId}
-				<Datatable
-					hide_search={true}
-					source_data={filteredReports}
-					editable={false}
-					endpoint={{ main: 'reports' }}
-					headings={['ID', 'Contacto', 'Método de Pago', 'Monto', 'Fecha']}
-					fields={['id', 'contact_name', 'payment_method_name', 'amount', 'date']}
-				/>
-			{/key}
-		{:else if listType == 'user' && checkPermission(data.user, 'view_own_paymentreport')}
+		{:else if listType == 'user' && checkPermission(data.user, 'view_paymentreport') || !checkPermission(data.user, 'view_paymentreport') && checkPermission(data.user, 'view_own_paymentreport')}
 			{#key data.user.id}
 				<Datatable
 					hide_search={true}
