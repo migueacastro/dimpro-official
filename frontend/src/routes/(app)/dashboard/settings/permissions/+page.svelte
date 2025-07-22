@@ -124,7 +124,10 @@
 				
 			>
 				{#each groupsObject as group}
-					<option class="capitalize" value={group.id}>{group.name}</option>
+					<option class="capitalize" value={group.id}
+						>{#if group?.name == 'user'}Vendedor{:else if group?.name == 'staff'}Empleado{:else if group?.name == 'admin'}Administrador
+						{:else}{group?.name}{/if}</option
+					>
 				{/each}
 			</select>
 			<div class="mx-auto flex justify-center flex-col space-y-3">
