@@ -6,7 +6,7 @@
 
 	$: loaded = true;
 	const fields = new FormErrors();
-
+	let emailError: any = '';
 	interface FormErrors {
 		email: any;
 		password: any;
@@ -62,6 +62,7 @@
 				goto('/dashboard/');
 			} else {
 				errors = result.data.error;
+				emailError = result.data.error.error;
 				loaded = true;
 				return update({ reset: false });
 			}
@@ -154,12 +155,12 @@
 				{/if}
 			{/if}
 
-			{#if errors?.email?.length > 0}
+			{#if String(emailError).length > 0}
 				<div class="card variant-ghost-error mb-2 p-2 text-sm text-left">
 					<ul>
-						{#each errors?.email as error}
+						{#if String(emailError).length > 0}
 							<li>{error}</li>
-						{/each}
+						{/if}
 					</ul>
 				</div>
 			{/if}
