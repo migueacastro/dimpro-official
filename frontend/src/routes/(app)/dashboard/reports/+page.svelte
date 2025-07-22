@@ -77,41 +77,60 @@
 				</a>
 			{/if}
 		</div>
-		{#if listType == 'all' && checkPermission(data.user, 'view_paymentreport')}
-			<div class="flex flex-row space-x-2">
-				<div class="flex flex-col">
-					<label for="select-contact" class="text-md my-2">Usuario</label>
-					<input
-						class="input autocomplete my-2"
-						type="search"
-						name="autocomplete-search"
-						autocomplete="off"
-						bind:value={inputUser}
-						placeholder="Search..."
-						use:popup={popupSettings}
-						on:input={() => {
-							if (inputUser.length < 1) {
-								goto(`?user=&date=${selectedDate}`);
-							}
-						}}
-					/>
-					<div data-popup="popupAutocomplete" class="max-w-sm w-full card">
-						<Autocomplete
-							bind:input={inputUser}
-							options={data.listUsers}
-							on:selection={(e) => {
-								inputUser = e.detail.label;
-								selectedUserId = e.detail.value;
+		{#if checkPermission(data.user, 'view_paymentreport')}
+			{#if listType == 'all'}
+				<div class="flex flex-row space-x-2">
+					<div class="flex flex-col">
+						<label for="select-contact" class="text-md my-2">Usuario</label>
+						<input
+							class="input autocomplete my-2"
+							type="search"
+							name="autocomplete-search"
+							autocomplete="off"
+							bind:value={inputUser}
+							placeholder="Search..."
+							use:popup={popupSettings}
+							on:input={() => {
+								if (inputUser.length < 1) {
+									goto(`?user=&date=${selectedDate}`);
+								}
+							}}
+						/>
+						<div data-popup="popupAutocomplete" class="max-w-sm w-full card">
+							<Autocomplete
+								bind:input={inputUser}
+								options={data.listUsers}
+								on:selection={(e) => {
+									inputUser = e.detail.label;
+									selectedUserId = e.detail.value;
+									goto(`?user=${selectedUserId}&date=${selectedDate}`);
+								}}
+							/>
+						</div>
+					</div>
+					<div class="flex flex-col">
+						<label for="" class="text-md my-2">Mes</label>
+						<input
+							type="month"
+							class="input my-2"
+							name="month"
+							id="month"
+							min="1"
+							max="12"
+							step="1"
+							bind:value={selectedDate}
+							on:change={() => {
 								goto(`?user=${selectedUserId}&date=${selectedDate}`);
 							}}
 						/>
 					</div>
 				</div>
+			{:else if listType == 'user'}
 				<div class="flex flex-col">
 					<label for="" class="text-md my-2">Mes</label>
 					<input
 						type="month"
-						class="input my-2"
+						class="input my-2 w-fit"
 						name="month"
 						id="month"
 						min="1"
@@ -123,24 +142,7 @@
 						}}
 					/>
 				</div>
-			</div>
-		{:else if listType == 'user' && checkPermission(data.user, 'view_own_paymentreport')}
-			<div class="flex flex-col">
-				<label for="" class="text-md my-2">Mes</label>
-				<input
-					type="month"
-					class="input my-2 w-fit"
-					name="month"
-					id="month"
-					min="1"
-					max="12"
-					step="1"
-					bind:value={selectedDate}
-					on:change={() => {
-						goto(`?user=${selectedUserId}&date=${selectedDate}`);
-					}}
-				/>
-			</div>
+			{/if}
 		{/if}
 		{#if (listType == 'all' && selectedUserId) || listType == 'user'}
 			<div class="flex flex-row justify-between mt-2">
@@ -157,11 +159,13 @@
 					</div>
 					<div class="flex flex-row space-x-3">
 						<h2 class="h2">Comisión:</h2>
-						<h2 class="h2 font-bold">{((Number(totalAmount) * Number(data?.comission?.percentage || 0)) / 100).toFixed(2)}$</h2>
+						<h2 class="h2 font-bold">
+							{((Number(totalAmount) * Number(data?.comission?.percentage || 0)) / 100).toFixed(2)}$
+						</h2>
 					</div>
 				</div>
 
-				{#if filteredReports.length > 0 && checkPermission(data.user, 'view_export_paymentreport') || listType == 'user' && data.userReports.length > 0}
+				{#if (filteredReports.length > 0 && checkPermission(data.user, 'view_export_paymentreport')) || (listType == 'user' && data.userReports.length > 0)}
 					<button
 						class="btn variant-filled max-w-fit px-[2rem] ml-2 py-3 h-fit"
 						type="button"
@@ -173,7 +177,7 @@
 			</div>
 		{/if}
 
-		{#if selectedUserId && listType == 'all'}
+		{#if selectedUserId && listType == 'all' && checkPermission(data.user, 'view_paymentreport')}
 			{#key selectedUserId}
 				<Datatable
 					hide_search={true}
@@ -184,7 +188,17 @@
 					fields={['id', 'contact_name', 'payment_method_name', 'amount', 'date']}
 				/>
 			{/key}
-		{:else if listType == 'user'}
+			{#key selectedUserId}
+				<Datatable
+					hide_search={true}
+					source_data={filteredReports}
+					editable={false}
+					endpoint={{ main: 'reports' }}
+					headings={['ID', 'Contacto', 'Método de Pago', 'Monto', 'Fecha']}
+					fields={['id', 'contact_name', 'payment_method_name', 'amount', 'date']}
+				/>
+			{/key}
+		{:else if listType == 'user' && checkPermission(data.user, 'view_own_paymentreport')}
 			{#key data.user.id}
 				<Datatable
 					hide_search={true}
