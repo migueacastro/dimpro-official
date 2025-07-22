@@ -58,7 +58,7 @@ export VITE_MODE=$MODE
 # Start docker-compose
 echo "Starting in $MODE mode..."
 if [ "$MODE" = "production" ]; then
-  exec docker-compose up
+  exec docker compose up
 else
-  exec docker-compose up db api django-q frontend nginx
+  exec docker compose up db api django-q frontend nginx
 fi

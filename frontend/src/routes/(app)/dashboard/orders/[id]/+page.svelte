@@ -47,11 +47,17 @@
 					<h4 class="h4 capitalize my-2">Tipo de precio: {order?.pricetype?.name}</h4>
 					<h4 class="h4 capitalize my-2">Total: {order?.total}$</h4>
 					<h4 class="h4 capitalize my-2">Fecha: {order?.date_format}</h4>
-					<h4 class="h4 my-2">
-						<a class="text-primary-500" href={`/dashboard/${checkStaffGroup(order?.user)?"staff":"users"}/` + order?.user?.id}
-							>Email: {order?.user?.email}</a
-						>
-					</h4>
+					{#if checkPermission(data.user, 'view_user') || checkPermission(data.user, 'view_staff_user')}
+						<h4 class="h4 my-2">
+							<a
+								class="text-primary-500"
+								href={`/dashboard/${checkStaffGroup(order?.user) ? 'staff' : 'users'}/` +
+									order?.user?.id}>Email: {order?.user?.email}</a
+							>
+						</h4>
+					{:else}
+						<h4 class="h4 my-2">Email: {order?.user?.email}</h4>
+					{/if}
 				</div>
 			</div>
 		</div>
