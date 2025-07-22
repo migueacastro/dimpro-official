@@ -7,12 +7,17 @@ export const load: PageServerLoad = async ({fetch, locals, params}: any) => {
   if (!checkPermission(locals.user, 'view_paymentreport')) {
     return permissionError();
   }
-
+  
 
   const response = await fetch(`${apiURL}payment_reports/${params?.id}`);
   const report = await response.json();
+
   if (!report) {
     throw error(404, 'Report not found');
+  }
+
+  if (!checkPermission(locals.user, 'view_own_paymentreport') && locals.user.id == report?.user?.id) {
+    return permissionError();
   }
 
   return {

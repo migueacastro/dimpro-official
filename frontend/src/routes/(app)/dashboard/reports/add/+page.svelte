@@ -202,7 +202,7 @@
 			/>
 		</div>
 		<div class="flex flex-col space-y-2">
-			<label for="description">Descripción</label>
+			<label for="description">Descripción (A la cuenta de... y a la taza de...)</label>
 			<textarea name="description" id="description" class="textarea"> </textarea>
 		</div>
 		<button
