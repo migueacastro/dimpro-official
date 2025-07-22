@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({fetch, locals, params}: any) => {
     throw error(404, 'Report not found');
   }
 
-  if (!checkPermission(locals.user, 'view_own_paymentreport') && locals.user.id == report?.user?.id) {
+  if (locals.user.id != report?.user?.id) {
     return permissionError();
   }
 
