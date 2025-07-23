@@ -28,7 +28,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ["email", "name", "password", "confirmPassword", "phonenumber", "groups"]
+        fields = ["email", "name", "password", "confirmPassword", "phonenumber", "groups", "card_id", "address"]
 
     def create(self, validated_data):
         validated_data.pop(
@@ -130,6 +130,8 @@ class UserSerializer(serializers.ModelSerializer):
             "groups",
             "date_joined",
             "last_login",
+            "card_id",
+            "address",
         ]
         extra_kwargs = {
             "name": {"required": True},
@@ -159,7 +161,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["email", "name", "phonenumber"]
+        fields = ["email", "name", "phonenumber", "card_id", "address"]
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -333,6 +335,8 @@ class UserNestedSerializer(UserSerializer):
             "date_joined_format",
             "last_login_format",
             "groups",
+            "card_id",
+            "address",
         ]
 
     def get_orders(self, obj):
