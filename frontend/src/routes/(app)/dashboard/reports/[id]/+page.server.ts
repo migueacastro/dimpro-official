@@ -2,6 +2,7 @@ import { apiURL } from "$lib/api_url";
 import { checkPermission, permissionError } from "$lib/auth";
 import { error, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "../$types";
+import { changestatus } from "$lib/components/ReportStatusButton";
 
 export const load: PageServerLoad = async ({fetch, locals, params}: any) => {
   if (!checkPermission(locals.user, 'view_paymentreport')  && !checkPermission(locals.user, 'view_own_paymentreport')) {
@@ -44,5 +45,6 @@ export const actions: Actions = {
         error: { data }
       };
     }
-  }
+  },
+  changestatus,
 };

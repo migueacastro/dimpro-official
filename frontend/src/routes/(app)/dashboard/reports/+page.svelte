@@ -184,8 +184,8 @@
 					source_data={filteredReports}
 					editable={false}
 					endpoint={{ main: 'reports' }}
-					headings={['ID', 'Contacto', 'Método de Pago', 'Monto', 'Fecha']}
-					fields={['id', 'contact_name', 'payment_method_name', 'amount', 'date']}
+					headings={['ID', 'Contacto', 'Método de Pago', 'Monto', 'Estatus','Fecha']}
+					fields={['id', 'contact_name', 'payment_method_name', 'amount', 'status', 'date']}
 				/>
 			{/key}
 		{:else if listType == 'user' && checkPermission(data.user, 'view_paymentreport') || !checkPermission(data.user, 'view_paymentreport') && checkPermission(data.user, 'view_own_paymentreport')}
@@ -195,8 +195,8 @@
 					source_data={data.userReports}
 					editable={false}
 					endpoint={{ main: 'reports' }}
-					headings={['ID', 'Contacto', 'Método de Pago', 'Monto', 'Fecha']}
-					fields={['id', 'contact_name', 'payment_method_name', 'amount', 'date']}
+					headings={['ID', 'Contacto', 'Método de Pago', 'Monto', 'Estatus','Fecha']}
+					fields={['id', 'contact_name', 'payment_method_name', 'amount', 'status', 'date']}
 				/>
 			{/key}
 		{/if}

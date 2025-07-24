@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { checkPermission } from '$lib/auth';
+	import ReportStatusButton from '$lib/components/ReportStatusButton.svelte';
 	import type { ModalSettings, ToastSettings } from '@skeletonlabs/skeleton';
 	import { getModalStore, getToastStore } from '@skeletonlabs/skeleton';
 	export let data: any;
@@ -111,6 +112,9 @@
 						>
 							<i class="fa-solid fa-pencil"></i>
 						</button>
+					{/if}
+					{#if checkPermission(data.user, 'change_status_paymentreport')}
+						<ReportStatusButton {report} />
 					{/if}
 				</div>
 			</div>

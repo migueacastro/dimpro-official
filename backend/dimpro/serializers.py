@@ -465,7 +465,7 @@ class PaymentReportSerializer(serializers.ModelSerializer):
     payment_method_name = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = PaymentReport
-        fields = ["id", "user", "contact", "date", "amount", "payment_method", "description", "active", "payment_method_name", "contact_name"]
+        fields = ["id", "user", "contact", "date", "amount", "payment_method", "description", "active", "payment_method_name", "contact_name", "status"]
         extra_kwargs = {
             'description': {
                 'required': False, 

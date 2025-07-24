@@ -237,6 +237,10 @@ class PaymentReport(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     payment_method = models.ForeignKey(PaymentMethod, on_delete=models.DO_NOTHING) 
     description = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=16,choices= [
+        ('pagado', 'Pagado'),
+        ('pendiente', 'Pendiente')
+    ], default='pendiente')
     active = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         permissions = [
@@ -244,6 +248,7 @@ class PaymentReport(models.Model):
             ("view_all_contacts_paymentreport", "Can view all contacts"),
             ("view_own_paymentreport", "Can view its own payment report"),
             ("view_export_paymentreport", "Can export payment report"),
+            ("change_status_paymentreport", "Can change payment report status"),
         ]
 
 class Comission(models.Model):
