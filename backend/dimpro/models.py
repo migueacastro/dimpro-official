@@ -52,7 +52,9 @@ class CustomUserManager(UserManager):
 class User(AbstractBaseUser, PermissionsMixin): 
     id = models.AutoField(primary_key=True)
     email = models.EmailField(blank=True, default='', unique=True)
+    card_id = models.CharField(max_length=11, blank=True, default='')
     name = models.CharField(max_length=255, blank=True, default='')
+    address = models.TextField(blank=True, default='')
     last_name = models.CharField(max_length=255, blank=True, default='')
     phoneregex = RegexValidator(regex=r"^\+?58?\d{11,15}$")
     phonenumber = models.CharField(
@@ -78,6 +80,11 @@ class User(AbstractBaseUser, PermissionsMixin):
             ("add_staff_user", "Can add staff user"),
             ("view_settings_user", "Can view settings"),
             ("view_advanced_homepage_user", "Can view advanced homepage"),
+            ("change_own_email_user", "Can change its own email"),
+            ("change_own_name_user", "Can change its own name"),
+            ("change_own_phonenumber_user", "Can change its own phonenumber"),
+            ("change_own_cardid_user", "Can change its own card id"),
+            ("change_own_address_user", "Can change its own address"),
         ]
 
     def get_full_name(self):
@@ -230,6 +237,10 @@ class PaymentReport(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     payment_method = models.ForeignKey(PaymentMethod, on_delete=models.DO_NOTHING) 
     description = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=16,choices= [
+        ('pagado', 'Pagado'),
+        ('pendiente', 'Pendiente')
+    ], default='pendiente')
     active = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         permissions = [
@@ -237,6 +248,7 @@ class PaymentReport(models.Model):
             ("view_all_contacts_paymentreport", "Can view all contacts"),
             ("view_own_paymentreport", "Can view its own payment report"),
             ("view_export_paymentreport", "Can export payment report"),
+            ("change_status_paymentreport", "Can change payment report status"),
         ]
 
 class Comission(models.Model):

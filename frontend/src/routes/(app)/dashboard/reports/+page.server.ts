@@ -29,9 +29,13 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 
 	response = await fetch(apiURL + 'comissions/1');
 	let comission = await response.json();
-	
-	response = await fetch(apiURL+'users');
-	let users = await response.json();
+	response = await fetch(apiURL+"users");
+  let users = await response.json();
+  response = await fetch(apiURL+"staff");
+  let staff = await response.json();
+  users = [...users,...staff];
+
+  users.sort((a: any, b: any) => a.name.localeCompare(b.name));
 	const listUsers = users.map((user: any) => {
 		return {
 			label: user.name,

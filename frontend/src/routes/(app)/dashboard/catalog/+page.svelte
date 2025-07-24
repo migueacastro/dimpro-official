@@ -4,7 +4,7 @@
 	export let data;
 	let { products, user } = data;
 	async function downloadPDF() {
-		const response = await fetch('/dashboard/inventory/exportpdf', {
+		const response = await fetch('/dashboard/catalog/exportpdf', {
 			method: 'GET'
 		});
 		if (response.ok) {
