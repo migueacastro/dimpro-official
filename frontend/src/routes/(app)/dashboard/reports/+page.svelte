@@ -120,7 +120,9 @@
 							step="1"
 							bind:value={selectedDate}
 							on:change={() => {
-								goto(`?user=${selectedUserId}&date=${selectedDate}`);
+								setTimeout(() => {
+									goto(`?user=${selectedUserId}&date=${selectedDate}`, { invalidateAll: true });
+								}, 90);
 							}}
 						/>
 					</div>
@@ -179,6 +181,7 @@
 
 		{#if selectedUserId && listType == 'all' && checkPermission(data.user, 'view_paymentreport')}
 			{#key selectedUserId}
+				{#key filteredReports.length}
 				<Datatable
 					hide_search={true}
 					source_data={filteredReports}
@@ -187,6 +190,7 @@
 					headings={['ID', 'Contacto', 'Método de Pago', 'Monto', 'Estatus','Fecha']}
 					fields={['id', 'contact_name', 'payment_method_name', 'amount', 'status', 'date']}
 				/>
+				{/key}
 			{/key}
 		{:else if listType == 'user' && checkPermission(data.user, 'view_paymentreport') || !checkPermission(data.user, 'view_paymentreport') && checkPermission(data.user, 'view_own_paymentreport')}
 			{#key data.user.id}

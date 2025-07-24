@@ -132,6 +132,7 @@ PERMISSION_TRANSLATIONS = {
     "name": "nombre",
     "email": "correo electrónico",
     "its own address": "su propia dirección",
+    "payment report status": "estado del reporte de pago",
 }
 
 PERMISSION_CONTENT_TYPE_NAME_TRANSLATIONS = {
@@ -155,6 +156,7 @@ PERMISSION_CONTENT_TYPE_NAME_TRANSLATIONS = {
     "advanced homepage": "página de inicio avanzada",
     "custom seller": "otro vendedor",
     "its own address": "su propia dirección",
+    "payment report status": "estado del reporte de pago",
 }
 PERMISSION_CONTENT_TYPE_TRANSLATIONS = {
     "user": "usuario",
@@ -188,6 +190,7 @@ PERMISSION_CONTENT_TYPE_TRANSLATIONS = {
     "comission": "comisión",
     "card id": "cédula de identidad",
     "its own address": "su propia dirección",
+    "payment report status": "estado del reporte de pago",
 }
 
 
