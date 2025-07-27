@@ -46,8 +46,8 @@ services:
       - ./backend/static_root:/usr/src/app/static_root
       - ./backend/media:/usr/src/app/media
     command: >
-      sh -c  "python manage.py makemigrations && 
-              python manage.py migrate && 
+      sh -c  "python manage.py makemigrations --merge && 
+              python manage.py migrate  && 
               python manage.py collectstatic --noinput && 
               python manage.py runserver 0.0.0.0:8000"
     depends_on:
