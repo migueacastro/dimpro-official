@@ -508,3 +508,8 @@ class ComissionSerializer(serializers.ModelSerializer):
         model = Comission
         fields = ["id", "percentage", "active"]
     
+
+class InvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invoice
+        fields = ["id", "total", "seller_name", "date"]

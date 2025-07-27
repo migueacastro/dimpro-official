@@ -8,8 +8,10 @@ export default defineConfig(({mode}) => {
   const URL = `${env.VITE_DOMAIN ?? 'localhost'}`;
 
 return {
-
   plugins: [sveltekit(), purgeCss()],
+  ssr: {
+			noExternal: process.env.NODE_ENV === 'production' ? ['@carbon/charts'] : []
+	},
   server: {
     allowedHosts:[URL],
     host: "0.0.0.0",

@@ -5,6 +5,7 @@ from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.views import APIView
 from backend.settings import BASE_DIR, FRONTEND_URL
+from django.contrib.postgres.search import TrigramSimilarity
 import os
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters
@@ -1171,3 +1172,15 @@ class ComissionViewSet(SafeViewSet):
                 },
             )
         return Comission.objects.filter(active=True, id=1)
+
+
+class UserInvoiceViewSet(SafeViewSet):
+    serializer_class = InvoiceSerializer
+    permission_classes = (IsAuthenticated,)
+    def get_queryset(self):
+        search = self.request.query_params.get('search', self.request.user.name).strip()
+        return Invoice.objects.annotate(
+            similarity=TrigramSimilarity('seller_name', search)
+        ).filter(
+            similarity__gte=0.5
+        ).order_by("-date")
