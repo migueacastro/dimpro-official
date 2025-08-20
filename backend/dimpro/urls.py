@@ -26,6 +26,7 @@ router.register(r'payment_reports_user', UserPaymentReportViewSet, basename="pay
 router.register(r'payment_reports_user_month', PaymentReportUserMonth, basename="payment_reports_user_month")
 router.register(r'comissions', ComissionViewSet, basename="comissions")
 router.register(r'invoices', UserInvoiceViewSet, basename="invoices")
+router.register(r'contact_add_requests', ContactAddRequestViewSet)
 
 
 urlpatterns = [
@@ -47,7 +48,8 @@ urlpatterns = [
     path("export_payment_report_pdf", ExportSinglePaymentReportPDFView.as_view()),
     path("export_payment_reports_mont_user_pdf", ExportPaymentReportsMonthUserPDFView.as_view()),
     path("updatedb", UpdateDBView.as_view()),
-    path("alegratoken", AlegraTokenView.as_view())
+    path("alegratoken", AlegraTokenView.as_view()),
+    path("contact_add_request_approval", ContactAddRequestApproval.as_view()),
     # path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     # path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
