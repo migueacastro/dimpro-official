@@ -82,7 +82,16 @@ services:
     build: ./frontend
     volumes:
       - ./frontend:/frontend
-    command: sh -c "npm run dev"
+    command: >
+       sh -c "
+        if [ \"$MODE\" = \"production\" ]; then
+          echo \"Starting frontend in production...\";
+          npm run build &&
+          npm run preview;
+        else
+          echo \"Starting frontend in dev...\";
+          npm run dev;
+        fi"
     ports:
       - 3000:3000
     env_file: .env
