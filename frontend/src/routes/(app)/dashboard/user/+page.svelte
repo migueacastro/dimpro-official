@@ -94,7 +94,7 @@
 		</div>
 	</div>
 	{#if checkPermission(user, 'show_invoices_user') && checkPermission(user, 'view_invoice')}
-				{#if data?.invoices?.length > 0}
+				{#if Object.keys(data?.invoices)?.length > 0}
 					<InvoiceChart invoices={data?.invoices} />
 				{/if}
 	{/if}

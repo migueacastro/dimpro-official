@@ -35,7 +35,7 @@
 			</div>
 		</div>
 		{#if checkPermission(staff, 'show_invoices_user') && checkPermission(user, 'view_invoice')}
-			{#if data?.invoices?.length > 0}
+			{#if Object.keys(data?.invoices)?.length > 0}
 				<div class="card p-[3rem] mb-[2rem] flex flex-row justify-between shadow-md w-full">
 					<div class="flex flex-col w-full">
 						<h4 class="h2 font-bold capitalize my-2">Facturas de venta</h4>
