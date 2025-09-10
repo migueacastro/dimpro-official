@@ -9,8 +9,7 @@
 	export let options: any = {
 		title: 'Ventas facturadas (en USD)',
 		fileDownload: {
-			
-				fileName: `ventas_facturadas_${selectedYear}.csv`
+			fileName: `ventas_facturadas_${selectedYear}.csv`
 		},
 		axes: {
 			bottom: {
@@ -38,23 +37,26 @@
 </script>
 
 {#if Object.keys(invoices).length > 0}
-	<div class="card p-[3rem] mb-[2rem] flex flex-row justify-between shadow-md w-full">
-		<div class="flex flex-col w-full">
-			<h4 class="h2 font-bold capitalize my-2">Facturas de venta</h4>
+	<div class="card py-[4rem] mb-[2rem] flex flex-row justify-between shadow-md w-full">
+		<div class="overflow-auto lg:w-full lg:overflow-visible">
+			<div class="flex flex-col w-full">
+				<h4 class="h2 font-bold capitalize my-2 mx-[3rem]">Facturas de venta</h4>
 
-			<div class="w-full flex-col items-start">
-				<div class="flex flex-col space-y-4 w-fit">
-					<label for="year-select" class="h2 text-xl">Seleccione año:</label>
-					<select id="year-select" class="select w-[8rem]" bind:value={selectedYear}>
-						{#each Object.keys(invoices) as year}
-							<option value={year}>{year}</option>
-						{/each}
-					</select>
-				</div>
+				<div class="w-full flex-col items-start mx-[3rem]">
+					<div class="flex flex-col space-y-4 w-fit">
+						<label for="year-select" class="h2 text-xl">Seleccione año:</label>
+						<select id="year-select" class="select w-[8rem]" bind:value={selectedYear}>
+							{#each Object.keys(invoices) as year}
+								<option value={year}>{year}</option>
+							{/each}
+						</select>
+					</div>
 
-				<div class="w-full">
-					<LineChart data={invoices[selectedYear]} {options} />
+					
 				</div>
+				<div class="w-[25rem] lg:w-full pr-[2rem] pl-[2rem]">
+						<LineChart data={invoices[selectedYear]} {options} />
+					</div>
 			</div>
 		</div>
 	</div>

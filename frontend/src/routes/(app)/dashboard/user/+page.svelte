@@ -31,17 +31,17 @@
 		<div class="card p-[3rem] w-full mb-[2rem] flex flex-row justify-between shadow-md">
 			<div class="flex flex-col">
 				<div class="flex flex-col">
-					<h4 class="h2 font-bold capitalize my-2">
+					<h4 class="h3 lg:h2 font-bold capitalize my-2">
 						{!user?.name || user?.name.trim() == '' ? 'Usuario' : user.name}
 					</h4>
-					<h3 class="h3 font-bold capitalize my-2">
+					<h3 class="h4 lg:h3 font-bold capitalize my-2">
 						{checkStaffGroup(user)
 							? checkAdminGroup(user)
 								? 'Administrador'
 								: 'Empleado'
 							: 'Vendedor'}
 					</h3>
-					<h4 class="h4 my-2">
+					<h4 class="h5 lg:h4 my-2 flex-row">
 						<i class="fa-solid fa-envelope text-primary-500 dark:text-surface-50"></i>
 						{user?.email ?? 'No definido'}
 					</h4>
@@ -50,7 +50,7 @@
 			<i class="w-fit text-5xl fa-solid fa-user my-auto text-primary-500 dark:text-surface-50"></i>
 		</div>
 	</div>
-	<div class="lg:flex flex-row space-x-4">
+	<div class="lg:flex flex-row lg:space-x-4">
 		<div class="card p-[2rem] mb-[2rem] w-auto lg:w-1/3 shadow-md flex flex-row justify-between">
 			<div class="flex flex-col text-start pr-2">
 				<h4 class="h3 font-bold capitalize">Información</h4>
