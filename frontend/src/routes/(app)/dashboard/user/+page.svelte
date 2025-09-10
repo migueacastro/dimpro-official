@@ -94,6 +94,8 @@
 		</div>
 	</div>
 	{#if checkPermission(user, 'show_invoices_user') && checkPermission(user, 'view_invoice')}
-				<InvoiceChart invoices={data?.invoices} />
+				{#if data?.invoices?.length > 0}
+					<InvoiceChart invoices={data?.invoices} />
+				{/if}
 	{/if}
 </div>

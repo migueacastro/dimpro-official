@@ -16,7 +16,7 @@ export class FormErrors {
 		return /\d/.test(str);
 	}
 	validateEmail(email: string): boolean {
-		const emailRegex = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,}$/;
+		const emailRegex = /^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*@(gmail|outlook|hotmail)\.com$/;
 		return emailRegex.test(email);
 	}
 	validateText(text: string): boolean {
