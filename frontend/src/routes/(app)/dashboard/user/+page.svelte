@@ -29,25 +29,27 @@
 	<h4 class="h2 font-bold capitalize my-4">Perfil</h4>
 	<div class="flex flex-col lg:flex-row">
 		<div class="card p-[3rem] w-full mb-[2rem] flex flex-row justify-between shadow-md">
-			<div class="flex flex-col">
-				<div class="flex flex-col">
-					<h4 class="h3 lg:h2 font-bold capitalize my-2">
-						{!user?.name || user?.name.trim() == '' ? 'Usuario' : user.name}
-					</h4>
-					<h3 class="h4 lg:h3 font-bold capitalize my-2">
-						{checkStaffGroup(user)
-							? checkAdminGroup(user)
-								? 'Administrador'
-								: 'Empleado'
-							: 'Vendedor'}
-					</h3>
-					<h4 class="h5 lg:h4 my-2 flex-row">
-						<i class="fa-solid fa-envelope text-primary-500 dark:text-surface-50"></i>
-						{user?.email ?? 'No definido'}
-					</h4>
-				</div>
+			<div class="flex flex-col justify-between w-[70%]">
+				<div class="flex flex-col justify-between w-[70%] " />
+				<h4 class="h3 lg:h2 font-bold capitalize my-2 break-normal">
+					{!user?.name || user?.name.trim() == '' ? 'Usuario' : user.name}
+				</h4>
+				<h3 class="h4 lg:h3 font-bold capitalize my-2 break-normal">
+					{checkStaffGroup(user)
+						? checkAdminGroup(user)
+							? 'Administrador'
+							: 'Empleado'
+						: 'Vendedor'}
+				</h3>
+				<h4 class="h5 lg:h4 my-2 flex-row break-all">
+					<i class="fa-solid fa-envelope text-primary-500 dark:text-surface-50 "></i>
+					{user?.email ?? 'No definido'}
+				</h4>
 			</div>
-			<i class="w-fit text-5xl fa-solid fa-user my-auto text-primary-500 dark:text-surface-50"></i>
+			<div class="w-fit">
+				<i class="w-fit text-5xl fa-solid fa-user my-auto text-primary-500 dark:text-surface-50"
+				></i>
+			</div>
 		</div>
 	</div>
 	<div class="lg:flex flex-row lg:space-x-4">
@@ -94,8 +96,8 @@
 		</div>
 	</div>
 	{#if checkPermission(user, 'show_invoices_user') && checkPermission(user, 'view_invoice')}
-				{#if Object.keys(data?.invoices)?.length > 0}
-					<InvoiceChart invoices={data?.invoices} />
-				{/if}
+		{#if Object.keys(data?.invoices)?.length > 0}
+			<InvoiceChart invoices={data?.invoices} />
+		{/if}
 	{/if}
 </div>
