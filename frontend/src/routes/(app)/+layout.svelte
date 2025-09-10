@@ -106,7 +106,7 @@
 							class="w-fit my-2 mx-auto h4 font-bold"
 							on:click={hideDrawer}
 						>
-							Inventario
+							Catálogo
 						</a>
 					</li>
 				{/if}
