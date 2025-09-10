@@ -51,6 +51,11 @@
 			bind:value={inputContact}
 			placeholder="Search..."
 			use:popup={popupSettings}
+			on:keypress={(e) => {
+				if (e.key === 'Enter') {
+					e.preventDefault();
+				}
+			}}
 		/>
 		<div data-popup="popupAutocomplete" class="max-w-md w-full card">
 			<Autocomplete
