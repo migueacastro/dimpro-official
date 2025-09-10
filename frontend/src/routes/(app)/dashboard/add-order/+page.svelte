@@ -39,7 +39,7 @@
 </script>
 
 <h1 class="h2 my-4">Crear Pedido</h1>
-<div class="flex flex-col w-1/2 max-w-md">
+<div class="flex flex-col  w-full lg:w-1/2 max-w-md">
 	<form action="?/create" method="post" use:enhance={handleSubmit}>
 		<label for="select-contact" class="text-md my-2">Cliente</label>
 		<input type="hidden" name="user" value={data.user.id}/>

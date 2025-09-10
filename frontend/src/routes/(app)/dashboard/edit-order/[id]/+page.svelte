@@ -338,6 +338,7 @@
 	$: loaded = false;
 	onMount(async () => {
 		loadItems(order);
+		addRow();
 		loaded = true;
 	});
 
@@ -433,12 +434,12 @@ $: console.log(selectedContactId)
 								<td>{row.id || ''}</td>
 								<td>
 									<div
-										class="input-group input-group-divider grid-cols-[1fr_auto] p-0"
+										class="w-[12rem] lg:w-auto input-group input-group-divider grid-cols-[1fr_auto] p-0"
 										class:variant-ghost-error={row.search_error}
 									>
 										<input
 											disabled={!checkPermission(user, 'change_order_product')}
-											class="input autocomplete"
+											class="input autocomplete "
 											class:variant-ghost-error={row.search_error}
 											type="search"
 											autocomplete="off"
@@ -478,7 +479,7 @@ $: console.log(selectedContactId)
 								<td
 									><input
 										type="number"
-										class="input"
+										class="input w-[12rem] lg:w-auto"
 										min="1"
 										disabled={row.input_disabled || !checkPermission(user, 'change_order_product')}
 										bind:value={row.quantity}

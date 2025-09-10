@@ -24,7 +24,7 @@
 	$: if (sortedReminders && !reminderSelected) {
 		reminderSelected = sortedReminders[0] || null;
 	}
-	let buttonAction = '';
+	let buttonAction = reminders?.length < 1 ? 'create' : '';
 	function carouselLeft(): void {
 		const x =
 			elemCarousel.scrollLeft === 0
@@ -118,10 +118,10 @@
 
 <div class="mx-auto w-full lg:w-3/4 my-2">
 	<div class="flex flex-row space-x-2 items-center">
-		{#if reminders?.length > 1 || checkPermission(user, 'add_note')}
+		{#if reminders?.length > 0 || checkPermission(user, 'add_note')}
 		<h2 class="h2 my-4">Información</h2>
 		{/if}
-		{#if buttonAction !== 'create'}{#if checkPermission(user, 'add_note')}
+		{#if buttonAction !== 'create' }{#if checkPermission(user, 'add_note') }
 				<button
 					class="btn variant-filled px-6 h-[2rem]"
 					on:click={() => {
@@ -139,23 +139,23 @@
 		<ProgressRadial />
 	</div>
 {:else}
-	<div class="grid grid-cols-[auto_1fr_auto] gap-4 items-center w-full">
+	<div class="flex items-center w-full">
 		{#if buttonAction === 'create' || !reminders || reminders.length < 1}
 			{#if checkPermission(user, 'add_note')}
 				<form
 					action="?/addReminder"
 					method="post"
-					class="w-full mx-auto lg:ml-[10rem]"
+					class="w-full flex flex-col mx-auto lg:mx-[10rem]"
 					use:enhance={handleResult}
 				>
 					<input type="hidden" name="name" bind:value={user.name} />
 					<textarea
-						class="textarea w-[40rem] h-[10rem] mx-auto mb-5"
+						class="textarea w-full min-h-[10rem] mx-auto mb-5"
 						name="note"
 						placeholder="Recordatorio"
 					></textarea>
 
-					<div class="flex gap-5">
+					<div class="flex lg:gap-5">
 						<button type="submit" class="btn variant-filled">
 							<i class="fa-solid fa-floppy-disk"></i>
 						</button>
@@ -176,7 +176,7 @@
 			{:else if buttonAction === 'edit'}
 				<form
 					action="?/editReminder"
-					class="mx-auto lg:ml-[10rem]"
+					class="mx-auto w-full lg:mx-[10rem]"
 					method="post"
 					use:enhance={handleResult}
 				>
@@ -184,7 +184,7 @@
 						<input type="hidden" name="id" bind:value={reminderSelected.id} />
 						<input type="hidden" name="name" bind:value={user.name} />
 						<textarea
-							class="textarea w-[40rem] mx-auto h-[10rem] mb-5"
+							class="textarea w-full mx-auto h-[10rem] mb-5"
 							name="note"
 							placeholder="Recordatorio">{reminderSelected.note}</textarea
 						>
@@ -211,11 +211,12 @@
 					</label>
 				</form>
 			{:else}
-				<div class="w-[3rem]">
+			<div class="flex flex-row w-full justify-between mx-auto">
+				<div class="flex flex-col justify-center pr-2">
 					{#if reminders.length > 1}
 						<button
 							type="button"
-							class="h-[3rem] w-[3rem] btn-icon variant-filled"
+							class="lg:h-[3rem] lg:w-[3rem] w-[1.7rem] h-[1.7rem] btn-icon variant-filled"
 							on:click={carouselLeft}
 						>
 							<i class="fa-solid fa-arrow-left" />
@@ -225,7 +226,7 @@
 
 				<div
 					bind:this={elemCarousel}
-					class="scroll-smooth flex overflow-hidden w-full mx-auto h-auto"
+					class="scroll-smooth flex overflow-hidden w-[80%] lg:w-[90%] mx-auto h-auto"
 				>
 					{#each sortedReminders as reminder}
 						<div class="card p-4 flex-none h-auto snap-start items-center w-full">
@@ -239,7 +240,7 @@
 									{#if checkPermission(user, 'delete_note')}
 										<button
 											type="button"
-											class="btn-icon variant-filled h-[3rem] w-[3rem]"
+											class="btn-icon variant-filled lg:h-[3rem] lg:w-[3rem] w-[1.7rem] h-[1.7rem]"
 											on:click={(e) => deleteConfirmation(reminder.note, e)}
 										>
 											<i class="fa-solid fa-trash" />
@@ -254,7 +255,7 @@
 
 								{#if checkPermission(user, 'change_note')}
 									<button
-										class="btn-icon variant-filled h-[3rem] w-[3rem]"
+										class="btn-icon variant-filled lg:h-[3rem] lg:w-[3rem] w-[2rem] h-[2rem]"
 										on:click={() => {
 											buttonAction = 'edit';
 											reminderSelected = { note: reminder.note, id: reminder.id };
@@ -268,17 +269,19 @@
 					{/each}
 				</div>
 
-				<div class="w-[3rem]">
+				<div class=" flex flex-col justify-center pl-2">
 					{#if reminders.length > 1}
 						<button
 							type="button"
-							class="h-[3rem] w-[3rem] btn-icon variant-filled"
+							class="lg:h-[3rem] lg:w-[3rem] w-[1.7rem] h-[1.7rem] btn-icon variant-filled"
 							on:click={carouselRight}
 						>
 							<i class="fa-solid fa-arrow-right" />
 						</button>
 					{/if}
 				</div>
+			</div>
+				
 			{/if}
 	</div>
 	{#if reminders.length > 1 && buttonAction !== 'create'}

@@ -59,7 +59,7 @@
 			</div>
 		</div>
 		<div class="flex flex-row flex-wrap justify-between mb-[2rem]">
-			<h2 class="h2 lg:my-0 my-2">Items: {order?.products?.length}</h2>
+			<h2 class="h3 lg:h2 lg:my-0 my-2">Items: {order?.products?.length}</h2>
 			<div class="flex flex-row">
 				{#if checkPermission(data.user, 'change_status_order')}
 					<StatusButton {order} />

@@ -7,7 +7,7 @@
 
 <th>
 	<input
-		class="input text-sm w-full"
+		class="input text-sm w-full min-w-[6rem]"
 		type="text"
 		placeholder="Filtrar"
 		bind:value
