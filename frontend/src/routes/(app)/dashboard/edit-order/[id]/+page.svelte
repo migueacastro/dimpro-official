@@ -94,9 +94,9 @@
 			row.availability = item_object.available_quantity;
 			row.item = item_object.id;
 			row.item_label = item_object.item;
-			let selectedPricetypeName = pricetypes.find(
-				(pricetype: any) => pricetype.id === selectedPricetypeId
-			)?.name ?? pricetypes[0]?.name;
+			let selectedPricetypeName =
+				pricetypes.find((pricetype: any) => pricetype.id === selectedPricetypeId)?.name ??
+				pricetypes[0]?.name;
 			row.price = Object.values(
 				item_object.prices.find(
 					(pricetype: any) => Object.keys(pricetype)[0] === selectedPricetypeName
@@ -145,8 +145,8 @@
 
 	function calculateCost(row: any) {
 		let item_object = products.find((product: any) => product.id === row.item);
-		if (row.quantity < 1) {
-			row.quantity = 1;
+		if (row.quantity < 0) {
+			row.quantity = 0;
 			calculateCost(row);
 			return;
 		} else if (item_object && row.quantity > item_object?.available_quantity) {
@@ -342,7 +342,7 @@
 		loaded = true;
 	});
 
-$: console.log(selectedContactId)
+	$: console.log(selectedContactId);
 </script>
 
 <title>Editar Pedidos</title>
@@ -439,7 +439,7 @@ $: console.log(selectedContactId)
 									>
 										<input
 											disabled={!checkPermission(user, 'change_order_product')}
-											class="input autocomplete "
+											class="input autocomplete"
 											class:variant-ghost-error={row.search_error}
 											type="search"
 											autocomplete="off"
@@ -484,6 +484,18 @@ $: console.log(selectedContactId)
 										disabled={row.input_disabled || !checkPermission(user, 'change_order_product')}
 										bind:value={row.quantity}
 										on:input={() => calculateCost(row)}
+										on:keypress={(e) => {
+											if (e.key === 'Enter') {
+												if (row.quantity < 1) {
+													row.quantity = 1;
+												}
+											}
+										}}
+										on:blur={() => {
+											if (row.quantity < 1) {
+												row.quantity = 1;
+											}
+										}}
 									/></td
 								>
 								<td>{row.availability || ''}</td>
@@ -574,7 +586,7 @@ $: console.log(selectedContactId)
 			<h1 class="h2 mt-[2rem]">Total: {totalCost}$</h1>
 		</div>
 		{#if checkPermission(user, 'view_note')}
-		<Reminder {user} reminders={data.reminders} />
+			<Reminder {user} reminders={data.reminders} />
 		{/if}
 	</div>
 {:else}
