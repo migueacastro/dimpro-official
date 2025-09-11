@@ -146,7 +146,7 @@
 	function calculateCost(row: any) {
 		let item_object = products.find((product: any) => product.id === row.item);
 		if (row.quantity < 0) {
-			row.quantity = 0;
+			row.quantity = 1;
 			calculateCost(row);
 			return;
 		} else if (item_object && row.quantity > item_object?.available_quantity) {
