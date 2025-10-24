@@ -131,5 +131,30 @@ services:
       - .env
     depends_on:
       - nginx
+  restarter:
+    image: docker:cli
+    restart: unless-stopped
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+    entrypoint: ["/bin/sh","-c"]
+    env_file:
+      - .env
+    command:
+      - |
+        echo "Starting restarter (TZ=$$TZ)"
+        RESTART_SERVICES="$${RESTART_SERVICES:-db api django-q nginx certbot}"
+        RESTART_SECONDS="$${RESTART_SECONDS:-86400}"
+        while true; do
+          current_epoch=$$(date +%s)
+          target_epoch=$$(( $$(date -d $${RESTART_HOUR} +%s) + $${RESTART_SECONDS} ))
+          sleep_seconds=$$(( target_epoch - current_epoch ))
+          target_human=$$(date -d "@$$target_epoch" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -u -d "@$$target_epoch" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || printf "@%s" "$$target_epoch")         
+          echo "Restarting services at $$target_human (in $$sleep_seconds seconds) (services: $$RESTART_SERVICES)"
+          sleep $$sleep_seconds
+          
+
+          docker compose restart db
+          echo "Services where restarted"
+        done
+
 volumes:
   postgres_data:
