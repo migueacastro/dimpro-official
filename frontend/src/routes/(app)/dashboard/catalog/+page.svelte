@@ -19,7 +19,7 @@
 </script>
 
 <div class="flex items-center gap-4 my-4">
-	<h1 class="h2">Inventario</h1>
+	<h1 class="h2">Catálogo</h1>
 	{#if checkPermission(user, 'view_export_order')}
 		<button class="btn variant-filled max-w-fit px-6 h-full" type="button" on:click={downloadPDF}>
 			<i class="fa-solid fa-download"></i>
