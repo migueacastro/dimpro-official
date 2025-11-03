@@ -17,26 +17,46 @@ services:
       retries: 5
     post_start:
       - command: > 
-          bash -c "
+          bash -c '
             until pg_isready -U postgres; do
-              echo 'Waiting for PostgreSQL to be ready...';
+              echo "Waiting for PostgreSQL to be ready...";
               sleep 1;
             done;
-            if [ -f /backups/backup.dump ]; then
-              echo 'Backup file exists. Starting restore with --clean option...';
-              export PGPASSWORD=${POSTGRES_PASSWORD};
-              pg_restore --clean --if-exists -U postgres -h db -d postgres -v /backups/backup.dump;
+
+            LATEST_BACKUP=$(ls -t /backups/backup_*.dump 2>/dev/null | head -n1);
+
+            if [ -n "$$LATEST_BACKUP" ]; then
+              echo "Found latest backup: $$LATEST_BACKUP";
+              export PGPASSWORD='${POSTGRES_PASSWORD}';
+              pg_restore --clean --if-exists -U postgres -h db -d postgres -v "$$LATEST_BACKUP";
             else
-              echo 'Backup file does not exist. Skipping restore.';
+              echo "No backup files found. Skipping restore.";
             fi
-          "
+          '
     pre_stop:
       - command: > 
-          bash -c "
-            echo 'Starting backup';
-            export PGPASSWORD=${POSTGRES_PASSWORD};
-            pg_dump -U postgres -h db -d postgres -Fc -f /backups/backup.dump
-          "
+          bash -c '
+            echo "Starting backup";
+            export PGPASSWORD='${POSTGRES_PASSWORD}';
+            BACKUP_FILE="/backups/backup_$(date +%Y%m%d_%H%M%S).dump";
+            pg_dump -U postgres -h db -d postgres -Fc -f $$BACKUP_FILE;
+            echo "Backup created on pre_stop hook: $$BACKUP_FILE";
+          '
+    labels:
+      ofelia.enabled: true
+      ofelia.job-exec.backupdb.schedule: "${POSTGRES_BACKUP_SCHEDULE}"
+      ofelia.job-exec.backupdb.command: > 
+          bash -c '
+            echo "Starting backup";
+            export PGPASSWORD='${POSTGRES_PASSWORD}';
+            BACKUP_FILE="/backups/backup_$(date +%Y%m%d_%H%M%S).dump";
+            pg_dump -U postgres -h db -d postgres -Fc -f $$BACKUP_FILE;
+            echo "Backup created on ofelia schedule: $$BACKUP_FILE";
+
+            # Cleaning old backups
+            find /backups -name "backup_*.dump" -mtime +'${POSTGRES_BACKUP_MAX_DAYS_STORED}' -delete;
+            echo "Cleaned up backups older than '${POSTGRES_BACKUP_MAX_DAYS_STORED}' days"
+          '
   api:
     build: ./backend
     ports:
@@ -121,6 +141,11 @@ services:
       /startnginx.sh
       "
     env_file: .env
+    labels:
+      ofelia.enabled: true
+      ofelia.job-exec.certbot-update.schedule: "${NGINX_RELOAD_SCHEDULE}"
+      ofelia.job-exec.certbot-update.command: nginx -s reload
+
   certbot:
     image: certbot/certbot
     volumes:
@@ -131,30 +156,20 @@ services:
       - .env
     depends_on:
       - nginx
-  restarter:
-    image: docker:cli
-    restart: unless-stopped
-    volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-    entrypoint: ["/bin/sh","-c"]
-    env_file:
-      - .env
-    command:
-      - |
-        echo "Starting restarter (TZ=$$TZ)"
-        RESTART_SERVICES="$${RESTART_SERVICES:-db api django-q nginx certbot}"
-        RESTART_SECONDS="$${RESTART_SECONDS:-86400}"
-        while true; do
-          current_epoch=$$(date +%s)
-          target_epoch=$$(( $$(date -d $${RESTART_HOUR} +%s) + $${RESTART_SECONDS} ))
-          sleep_seconds=$$(( target_epoch - current_epoch ))
-          target_human=$$(date -d "@$$target_epoch" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -u -d "@$$target_epoch" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || printf "@%s" "$$target_epoch")         
-          echo "Restarting services at $$target_human (in $$sleep_seconds seconds) (services: $$RESTART_SERVICES)"
-          sleep $$sleep_seconds
-          
-
-          docker compose restart db
-          echo "Services where restarted"
-        done
-
+    labels:
+      ofelia.enabled: true
+      ofelia.job-exec.cerbot-update.schedule: "${CERTBOT_UPDATE_SCHEDULE}"
+      ofelia.job-exec.certbot-update.command: certonly --webroot -w /var/www/certbot --keep-until-expiring --email ${EMAIL} -d ${DOMAIN} --agree-tos      
+  ofelia:
+    image: mcuadros/ofelia:latest
+    depends_on:
+      - db 
+      - nginx
+      - certbot
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
 volumes:
   postgres_data:
