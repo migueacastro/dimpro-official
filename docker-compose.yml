@@ -164,6 +164,8 @@ services:
     image: mcuadros/ofelia:latest
     depends_on:
       - db 
+      - nginx
+      - certbot
     command: daemon --docker
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
