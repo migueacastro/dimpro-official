@@ -141,7 +141,10 @@ services:
       /startnginx.sh
       "
     env_file: .env
-
+    labels:
+      ofelia.enabled: true
+      ofelia.job-exec.nginx-reload.schedule: "${NGINX_UPDATE_SCHEDULE}"
+      ofelia.job-exec.nginx-reload.command: nginx -s reload
   certbot:
     image: certbot/certbot
     volumes:
@@ -157,7 +160,6 @@ services:
     depends_on:
       - db 
       - nginx
-      - certbot
     command: daemon --docker
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -165,15 +167,18 @@ services:
       - /etc/localtime:/etc/localtime:ro
     env_file:
       - .env
+    environment:
+      - PWD=${PWD}
     labels:
       ofelia.enabled: true
-      ofelia.job-local.certbot-update.schedule: "${CERTBOT_UPDATE_SCHEDULE}"
-      ofelia.job-local.certbot-update.command: >
-        sh -c "if [ \"${MODE}\" = \"production\" ]; then
-          docker compose exec -T certbot certonly --webroot -w /var/www/certbot --keep-until-expiring --email ${EMAIL} -d ${DOMAIN} --agree-tos --force-renewal &&
-          echo \"Certbot succeeded, reloading nginx\" &&
-          docker compose exec -T nginx nginx -s reload
-        fi"
+      ofelia.job-run.certbot-update.schedule: "${CERTBOT_UPDATE_SCHEDULE}"
+      ofelia.job-run.certbot-update.command: certonly --webroot -w /var/www/certbot --keep-until-expiring --email ${EMAIL} -d ${DOMAIN} --agree-tos
+      ofelia.job-run.certbot-update.image: certbot/certbot
+      ofelia.job-run.certbot-update.delete: false
+      ofelia.job-run.certbot-update.volume.0: "${PWD}/certbot/conf:/etc/letsencrypt"
+      ofelia.job-run.certbot-update.volume.1: "${PWD}/certbot/www:/var/www/certbot"
+        
+      
 
 
 volumes:
